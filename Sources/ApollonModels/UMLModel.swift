@@ -13,10 +13,7 @@ public struct UMLModel: Codable {
 public struct Size: Codable {
     public var width: CGFloat
     public var height: CGFloat
-<<<<<<< Updated upstream
-=======
     public var asCGSize: CGSize {
         CGSize(width: width, height: height)
     }
->>>>>>> Stashed changes
 }

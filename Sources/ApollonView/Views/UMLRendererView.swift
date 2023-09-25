@@ -1,11 +1,12 @@
 import SwiftUI
+import ApollonCommon
 
-public struct UMLRendererView: View {
+struct UMLRendererView: View {
     @StateObject public var viewModel: ApollonViewViewModel
     
-    public var body: some View {
+    var body: some View {
         ZStack(alignment: .topLeading) {
-            viewModel.loadGridBackgroundImage()
+            viewModel.getGridBackground()
                 .resizable(resizingMode: .tile)
             Group {
                 Canvas(rendersAsynchronously: true) { context, size in

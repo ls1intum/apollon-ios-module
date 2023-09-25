@@ -1,15 +1,16 @@
 import SwiftUI
+import ApollonCommon
 
-struct UMLModelRenderer: View {
-    @StateObject var diagramViewModel: DiagramViewModel
+struct UMLRendererEdit: View {
+    @StateObject public var viewModel: ApollonEditViewModel
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            viewModel.loadGridBackgroundImage()
+            viewModel.getGridBackground()
                 .resizable(resizingMode: .tile)
             Group {
                 Canvas(rendersAsynchronously: true) { context, size in
-                    diagramViewModel.render(&context, size: size)
+                    viewModel.render(&context, size: size)
                 }
             }
         }
