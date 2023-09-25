@@ -31,6 +31,37 @@ public class UMLElement: Codable, SelectableUMLItem {
         type?.rawValue
     }
     
+    public var highlightPath: Path? {
+        guard let boundsAsCGRect else {
+            return nil
+        }
+        
+        return Path(boundsAsCGRect.insetBy(dx: -1, dy: -1))
+    }
+    
+    public lazy var badgeLocation: CGPoint? = {
+        guard let boundsAsCGRect else {
+            return nil
+        }
+        
+        return CGPoint(x: boundsAsCGRect.maxX, y: boundsAsCGRect.minY)
+    }()
+    
+    /// Returns a rectangular path from the top of the element until the top of the vertically highest child
+    public var suggestedHighlightPath: Path? {
+        guard let boundsAsCGRect,
+              let highestChildMinY = verticallySortedChildren?.first?.boundsAsCGRect?.minY else {
+            return highlightPath
+        }
+        
+        var path = Path()
+        path.move(to: boundsAsCGRect.origin)
+        path.addLine(to: .init(x: boundsAsCGRect.maxX, y: boundsAsCGRect.minY))
+        path.addLine(to: .init(x: boundsAsCGRect.maxX, y: highestChildMinY))
+        path.addLine(to: .init(x: boundsAsCGRect.minX, y: highestChildMinY))
+        return path
+    }
+    
     /// Recursively looks for the child UML element located at the given point
     public func getChild(at point: CGPoint) -> UMLElement? {
         guard let children else {

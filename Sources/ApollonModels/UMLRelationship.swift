@@ -47,6 +47,45 @@ public struct UMLRelationship: Codable, SelectableUMLItem {
         return result
     }
     
+    public var highlightPath: Path? {
+        var result = Path()
+        
+        if let pathWithCGPoints {
+            result = pathWithCGPoints.strokedPath(.init(lineWidth: 20))
+        } else {
+            result.addRects(pathRects)
+        }
+        return result
+    }
+    
+    public var temporaryHighlightPath: Path? {
+        guard let path, let boundsAsCGRect else {
+            return nil
+        }
+        var result = Path()
+        result.addLines(path.map({ $0.asCGPoint.applying(.init(translationX: boundsAsCGRect.minX, y: boundsAsCGRect.minY)) }))
+        return result
+    }
+    
+    public var badgeLocation: CGPoint? {
+        guard let path, let boundsAsCGRect else {
+            return nil
+        }
+        
+        // The idea is to find the mid point if the number of points is odd.
+        // If the number of points is even, then the number of pathRects between them is going to be odd. This means we can find the mid CGRect and take it's mid point to place the badge.
+        
+        if !path.count.isMultiple(of: 2) { // odd point count
+            return path[path.count / 2].asCGPoint.applying(.init(translationX: boundsAsCGRect.minX,
+                                                                 y: boundsAsCGRect.minY)) // mid point
+        } else if !pathRects.count.isMultiple(of: 2) { // odd rect count
+            let midRect = pathRects[pathRects.count / 2]
+            return CGPoint(x: midRect.midX, y: midRect.midY) // mid point
+        }
+        
+        return nil
+    }
+    
     /// Maps the different points into one path
     public var pathWithCGPoints: Path? {
         guard let boundsAsCGRect,
