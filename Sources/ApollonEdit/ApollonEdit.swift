@@ -1,8 +1,8 @@
 import SwiftUI
 import ApollonModels
-import ApollonCommon
+import Common
 
-struct ApollonEdit: View {
+public struct ApollonEdit: View {
     @StateObject var viewModel = ApollonEditViewModel()
     var umlModel: UMLModel
     var diagramType: UMLDiagramType

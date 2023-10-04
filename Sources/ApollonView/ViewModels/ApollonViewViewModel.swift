@@ -1,5 +1,5 @@
 import Foundation
-import ApollonCommon
+import Common
 import ApollonModels
 
 open class ApollonViewViewModel: ApollonViewModel {
