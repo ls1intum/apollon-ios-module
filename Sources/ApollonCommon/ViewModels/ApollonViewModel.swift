@@ -66,6 +66,7 @@ open class ApollonViewModel: ObservableObject {
     }
     
     public static func getGridBackground() -> Image {
-        return Image("UMLGridBackground", bundle: .module).resizable(resizingMode: .tile)
+        return Image("UMLGridBackground", bundle: .module)
+            .resizable(resizingMode: .tile)
     }
 }
