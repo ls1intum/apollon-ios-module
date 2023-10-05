@@ -1,6 +1,6 @@
 import SwiftUI
 import ApollonModels
-import Common
+import ApollonCommon
 
 public struct ApollonView: View {
     @StateObject var viewModel = ApollonViewViewModel()

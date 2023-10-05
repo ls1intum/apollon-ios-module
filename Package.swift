@@ -33,16 +33,16 @@ let package = Package(
             name: "ApollonModels"
         ),
         .target(
-            name: "Common",
+            name: "ApollonCommon",
             dependencies: ["SwiftyBeaver", "ApollonModels"]
         ),
         .target(
             name: "ApollonView",
-            dependencies: ["Common", "ApollonModels"]
+            dependencies: ["ApollonCommon", "ApollonModels"]
         ),
         .target(
             name: "ApollonEdit",
-            dependencies: ["Common", "ApollonModels"]
+            dependencies: ["ApollonCommon", "ApollonModels"]
         )
     ]
 )

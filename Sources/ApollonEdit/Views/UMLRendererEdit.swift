@@ -1,5 +1,5 @@
 import SwiftUI
-import Common
+import ApollonCommon
 
 struct UMLRendererEdit: View {
     @StateObject public var viewModel: ApollonEditViewModel
