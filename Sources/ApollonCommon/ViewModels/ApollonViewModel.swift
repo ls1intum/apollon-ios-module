@@ -7,22 +7,24 @@ open class ApollonViewModel: ObservableObject {
     @Published public var diagramType: UMLDiagramType?
     @Published public var fontSize: CGFloat
     @Published public var diagramOffset: CGPoint
-    @Published public var selectedElement: SelectableUMLItem?
+    @Published public var isGridBackground: Bool
     public var diagramTypeUnsupported = false
     
-    public init(umlModel: UMLModel? = nil, diagramType: UMLDiagramType? = nil, fontSize: CGFloat? = nil, diagramOffset: CGPoint? = nil) {
+    public init(umlModel: UMLModel? = nil, diagramType: UMLDiagramType? = nil, fontSize: CGFloat? = nil, diagramOffset: CGPoint? = nil, isGridBackground: Bool? = nil) {
         self.umlModel = umlModel
         self.diagramType = diagramType ?? umlModel?.type
         self.fontSize = fontSize ?? 14.0
         self.diagramOffset = diagramOffset ?? CGPoint(x: 0, y: 0)
+        self.isGridBackground = isGridBackground ?? false
     }
     
     @MainActor
-    public func setup(umlModel: UMLModel, diagramType: UMLDiagramType?, fontSize: CGFloat?, diagramOffset: CGPoint?) {
+    public func setup(umlModel: UMLModel, diagramType: UMLDiagramType?, fontSize: CGFloat?, diagramOffset: CGPoint?, isGridBackground: Bool?) {
         self.umlModel = umlModel
         self.diagramType = diagramType ?? umlModel.type
         self.fontSize = fontSize ?? 14.0
         self.diagramOffset = diagramOffset ?? CGPoint(x: 0, y: 0)
+        self.isGridBackground = isGridBackground ?? false
         determineChildren()
     }
     
@@ -63,7 +65,7 @@ open class ApollonViewModel: ObservableObject {
         umlModel?.elements = elements
     }
     
-    public func getGridBackground() -> Image {
-        return Image("UMLGridBackground", bundle: .module)
+    public static func getGridBackground() -> Image {
+        return Image("UMLGridBackground", bundle: .module).resizable(resizingMode: .tile)
     }
 }

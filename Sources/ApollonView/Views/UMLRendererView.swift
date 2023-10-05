@@ -6,8 +6,9 @@ struct UMLRendererView: View {
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            viewModel.getGridBackground()
-                .resizable(resizingMode: .tile)
+            if viewModel.isGridBackground {
+                ApollonViewViewModel.getGridBackground()
+            }
             Group {
                 Canvas(rendersAsynchronously: true) { context, size in
                     viewModel.render(&context, size: size)
