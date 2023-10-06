@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import ApollonModels
+import ApollonShared
 
 open class ApollonViewModel: ObservableObject {
     @Published public var umlModel: UMLModel?
@@ -63,10 +63,5 @@ open class ApollonViewModel: ObservableObject {
             }
         }
         umlModel?.elements = elements
-    }
-    
-    public static func getGridBackground() -> Image {
-        return Image("UMLGridBackground", bundle: .module)
-            .resizable(resizingMode: .tile)
     }
 }

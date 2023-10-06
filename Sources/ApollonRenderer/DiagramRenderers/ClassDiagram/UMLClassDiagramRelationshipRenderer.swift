@@ -1,5 +1,5 @@
 import SwiftUI
-import ApollonModels
+import ApollonShared
 
 // swiftlint:disable:next type_body_length
 struct UMLClassDiagramRelationshipRenderer: UMLDiagramRenderer {

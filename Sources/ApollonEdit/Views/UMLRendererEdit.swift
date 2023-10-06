@@ -1,5 +1,5 @@
 import SwiftUI
-import ApollonCommon
+import ApollonShared
 
 struct UMLRendererEdit: View {
     @StateObject public var viewModel: ApollonEditViewModel
@@ -7,7 +7,7 @@ struct UMLRendererEdit: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             if viewModel.isGridBackground {
-                ApollonEditViewModel.getGridBackground()
+                GridBackgroundView()
             }
             Group {
                 Canvas(rendersAsynchronously: true) { context, size in

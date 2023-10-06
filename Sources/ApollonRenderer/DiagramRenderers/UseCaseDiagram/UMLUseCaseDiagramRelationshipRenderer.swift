@@ -1,5 +1,5 @@
 import SwiftUI
-import ApollonModels
+import ApollonShared
 
 struct UMLUseCaseDiagramRelationshipRenderer: UMLDiagramRenderer {
     var context: UMLGraphicsContext

@@ -1,5 +1,5 @@
 import SwiftUI
-import ApollonModels
+import ApollonShared
 
 protocol UMLDiagramRenderer {
     /// This instance should be used for all actions that one would normally perform with a `GraphicsContext`

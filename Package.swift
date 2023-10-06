@@ -10,8 +10,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "ApollonModels",
-            targets: ["ApollonModels"]
+            name: "ApollonShared",
+            targets: ["ApollonShared"]
         ),
         .library(
             name: "ApollonView",
@@ -30,19 +30,19 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "ApollonModels"
+            name: "ApollonShared"
         ),
         .target(
-            name: "ApollonCommon",
-            dependencies: ["SwiftyBeaver", "ApollonModels"]
+            name: "ApollonRenderer",
+            dependencies: ["SwiftyBeaver", "ApollonShared"]
         ),
         .target(
             name: "ApollonView",
-            dependencies: ["ApollonCommon", "ApollonModels"]
+            dependencies: ["ApollonRenderer", "ApollonShared"]
         ),
         .target(
             name: "ApollonEdit",
-            dependencies: ["ApollonCommon", "ApollonModels"]
+            dependencies: ["ApollonRenderer", "ApollonShared"]
         )
     ]
 )

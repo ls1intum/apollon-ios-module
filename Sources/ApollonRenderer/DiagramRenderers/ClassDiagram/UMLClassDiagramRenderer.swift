@@ -1,5 +1,5 @@
 import SwiftUI
-import ApollonModels
+import ApollonShared
 
 struct UMLClassDiagramRenderer: UMLDiagramRenderer {
     var context: UMLGraphicsContext

@@ -41,4 +41,14 @@ public enum UMLDiagramType: String, Codable {
             return [.flowchartFunctionCall, .flowchartInputOutput, .flowchartDecision, .flowchartProcess, .flowchartTerminal]
         }
     }
+    
+    /// Returns true, if the diagram type has no supported renderer yet.
+    public static func isDiagramTypeUnsupported(diagramType: UMLDiagramType) -> Bool {
+        switch diagramType {
+        case .classDiagram, .useCaseDiagram:
+            return false
+        default:
+            return true
+        }
+    }
 }
