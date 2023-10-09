@@ -20,6 +20,10 @@ public struct ApollonEdit: View {
     public var body: some View {
         ZStack {
             UMLRendererEdit(viewModel: viewModel)
+            if viewModel.selectedElement != nil {
+                EditSelectedItemButton(viewModel: viewModel)
+            }
+            MenuButton(viewModel: viewModel)
         }.onAppear() {
             viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
         }.onChange(of: fontSize) { newValue in
