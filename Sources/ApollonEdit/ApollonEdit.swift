@@ -18,16 +18,23 @@ public struct ApollonEdit: View {
     }
 
     public var body: some View {
-        ZStack {
-            UMLRendererEdit(viewModel: viewModel)
-            if viewModel.selectedElement != nil {
-                EditSelectedItemButton(viewModel: viewModel)
+        GeometryReader { geometry in
+            ZStack(alignment: .topLeading) {
+                UMLRendererEdit(viewModel: viewModel)
+                HStack {
+                    ResetZoomAndLocationButton(viewModel: viewModel)
+                    if viewModel.selectedElement != nil {
+                        EditSelectedItemButton(viewModel: viewModel)
+                    }
+                    Spacer()
+                    MenuButton(viewModel: viewModel)
+                }.padding()
+            }.onAppear() {
+                viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
+                viewModel.setupScale(geometrySize: geometry.size)
+            }.onChange(of: fontSize) { newValue in
+                viewModel.fontSize = newValue
             }
-            MenuButton(viewModel: viewModel)
-        }.onAppear() {
-            viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
-        }.onChange(of: fontSize) { newValue in
-            viewModel.fontSize = newValue
         }
     }
 }

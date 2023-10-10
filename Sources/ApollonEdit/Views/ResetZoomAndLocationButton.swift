@@ -1,14 +1,15 @@
 import SwiftUI
 
-struct EditSelectedItemButton: View {
+struct ResetZoomAndLocationButton: View {
     @StateObject var viewModel: ApollonEditViewModel
-    @State private var isShowingPopup: Bool = false
     
     var body: some View {
         Button {
-            isShowingPopup.toggle()
+            viewModel.setDragLocation()
+            viewModel.scale = viewModel.minScale
+            viewModel.progressingScale = 1.0
         } label: {
-            Image(systemName: "slider.horizontal.3")
+            Image(systemName: "scope")
                 .frame(width: 25, height: 25)
                 .foregroundColor(.white)
                 .padding(5)
@@ -16,8 +17,6 @@ struct EditSelectedItemButton: View {
                     RoundedRectangle(cornerRadius: 5)
                         .foregroundColor(.blue)
                 }
-        }.sheet(isPresented: $isShowingPopup) {
-            ElementEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)
         }
     }
 }

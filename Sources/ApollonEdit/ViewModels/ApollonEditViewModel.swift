@@ -4,23 +4,38 @@ import ApollonRenderer
 import ApollonShared
 
 open class ApollonEditViewModel: ApollonViewModel {
-    @Published public var selectedElement: SelectableUMLItem?
+    @Published var selectedElement: SelectableUMLItem?
+    @Published var geometrySize = CGSize.zero
     @Published var currentDragLocation = CGPoint.zero
+    @Published var scale: CGFloat = 1.0
+    @Published var progressingScale: CGFloat = 1.0
+    @Published var minScale: CGFloat = 0.3
+    @Published var maxScale: CGFloat = 5.0
     
+    @MainActor
     var diagramSize: CGSize {
         umlModel?.size?.asCGSize ?? CGSize()
     }
     
     @MainActor
-    /// Sets the drag location to the specified point
-    /// - Parameter point: when nil, the drag location is set in such a way that centers the diagram
     func setDragLocation(at point: CGPoint? = nil) {
         if let point {
             currentDragLocation = point
         } else {
-            currentDragLocation = .init(x: diagramSize.height - 50,
-                                        y: diagramSize.width - 50)
+            currentDragLocation = CGPoint(x: geometrySize.width / 2, y: geometrySize.height / 2)
         }
+    }
+    
+    @MainActor
+    func setupScale(geometrySize: CGSize) {
+        self.geometrySize = geometrySize
+        
+        let scaleWidth = self.geometrySize.width / (diagramSize.width)
+        let scaleHeight = self.geometrySize.height / (diagramSize.height)
+        let initialScale = min(scaleWidth, scaleHeight)
+        
+        minScale = min(max(initialScale, minScale), maxScale)
+        scale = minScale
     }
     
     @MainActor
@@ -110,45 +125,45 @@ open class ApollonEditViewModel: ApollonViewModel {
             selectedElement?.bounds?.x = location.x
             selectedElement?.bounds?.y = location.y
             
-//            if let relationships = diagram?.model?.relationships {
-//                for (index, relationship) in relationships.enumerated() {
-//                    if var bounds = relationship.bounds {
-//                        if relationship.source?.element == element.id {
-////                            if var path = relationship.path {
-////                                if path.count >= 2 {
-////                                    var pathFirst = path.first
-////                                    var pathLast = path.last
-////                                }
-////                                for (pathIndex, _) in path.enumerated() where pathIndex > 0{
-////                                    path[pathIndex].x += drag.translation.width
-////                                    path[pathIndex].y += drag.translation.height
-////                                }
-////                                diagram?.model?.relationships?[index].path = path
-////                            }
-//                            //bounds.x = location.x
-//                            //bounds.y = location.y
-////                            bounds.width = drag.translation.width
-////                            bounds.height = drag.translation.height
-//                            diagram?.model?.relationships?[index].bounds = bounds
-//                        } else if relationship.target?.element == element.id {
-//                            if var path = relationship.path {
-//                                path.last.x =
-//                                path.last.y =
-//                                for (pathIndex, _) in path.enumerated() where pathIndex > 0 {
-//                                    path[pathIndex].x += drag.translation.width
-//                                    path[pathIndex].y += drag.translation.height
-//                                }
-//                                diagram?.model?.relationships?[index].path = path
-//                            }
-////                            let newWidth = bounds.width + (bounds.x - location.x)
-////                            let newHeight = bounds.height + (bounds.y - location.y)
-////                            bounds.width = newWidth
-////                            bounds.height = newHeight
-//                            diagram?.model?.relationships?[index].bounds = bounds
-//                        }
-//                    }
-//                }
-//            }
+            //            if let relationships = diagram?.model?.relationships {
+            //                for (index, relationship) in relationships.enumerated() {
+            //                    if var bounds = relationship.bounds {
+            //                        if relationship.source?.element == element.id {
+            ////                            if var path = relationship.path {
+            ////                                if path.count >= 2 {
+            ////                                    var pathFirst = path.first
+            ////                                    var pathLast = path.last
+            ////                                }
+            ////                                for (pathIndex, _) in path.enumerated() where pathIndex > 0{
+            ////                                    path[pathIndex].x += drag.translation.width
+            ////                                    path[pathIndex].y += drag.translation.height
+            ////                                }
+            ////                                diagram?.model?.relationships?[index].path = path
+            ////                            }
+            //                            //bounds.x = location.x
+            //                            //bounds.y = location.y
+            ////                            bounds.width = drag.translation.width
+            ////                            bounds.height = drag.translation.height
+            //                            diagram?.model?.relationships?[index].bounds = bounds
+            //                        } else if relationship.target?.element == element.id {
+            //                            if var path = relationship.path {
+            //                                path.last.x =
+            //                                path.last.y =
+            //                                for (pathIndex, _) in path.enumerated() where pathIndex > 0 {
+            //                                    path[pathIndex].x += drag.translation.width
+            //                                    path[pathIndex].y += drag.translation.height
+            //                                }
+            //                                diagram?.model?.relationships?[index].path = path
+            //                            }
+            ////                            let newWidth = bounds.width + (bounds.x - location.x)
+            ////                            let newHeight = bounds.height + (bounds.y - location.y)
+            ////                            bounds.width = newWidth
+            ////                            bounds.height = newHeight
+            //                            diagram?.model?.relationships?[index].bounds = bounds
+            //                        }
+            //                    }
+            //                }
+            //            }
             
             if var offset = element.bounds?.height, let elements = umlModel?.elements, let children = element.verticallySortedChildren {
                 for child in children.reversed() {

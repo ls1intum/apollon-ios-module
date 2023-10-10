@@ -5,29 +5,27 @@ struct MenuButton: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var body: some View {
-        GeometryReader { geometry in
-                Menu {
-                    Button("Submit & Exit"){
-                        presentationMode.wrappedValue.dismiss()
+        Menu {
+            Button("Problem Statement") {
+                
+            }
+            Menu("Add Element") {
+                ForEach(viewModel.diagramType?.diagramElementTypes ?? [], id: \.self) { type in
+                    Button(type.rawValue) {
+                        viewModel.addElement(type: type)
                     }
-                    Menu("Add Element") {
-                        ForEach(viewModel.diagramType?.diagramElementTypes ?? [], id: \.self) { type in
-                            Button(type.rawValue) {
-                                viewModel.addElement(type: type)
-                            }
-                        }
-                    }
-                    Button("Problem Statement") {
-                        
-                    }
-                } label: {
-                    Image(systemName: "info.circle.fill")
-                        .resizable()
-                        .frame(width: 75, height: 75)
-                        .foregroundColor(Color.blue)
-                        .symbolRenderingMode(.hierarchical)
-                }.frame(width: 75, height: 75)
-                    .position(x: geometry.size.width / 1.2, y: geometry.size.height / 1.05)
+                }
+            }
+            Button("Submit & Exit"){
+                presentationMode.wrappedValue.dismiss()
+            }
+        } label: {
+            Image(systemName: "gearshape.circle.fill")
+                .resizable()
+                .frame(width: 50, height: 50)
+                .foregroundColor(.blue)
+                .padding(5)
+                .symbolRenderingMode(.hierarchical)
         }
     }
 }
