@@ -67,18 +67,18 @@ open class ApollonEditViewModel: ApollonViewModel {
     }
     
     @MainActor
-    func renderHighlights(_ context: inout GraphicsContext, size: CGSize) {
-        if let element = selectedElement {
-            if let bounds = element.bounds {
+    func renderSelectedElement(_ context: inout GraphicsContext, size: CGSize) {
+        if let selectedElement {
+            if let bounds = selectedElement.bounds {
                 let highlightRect = CGRect(x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height)
-                if element is UMLRelationship {
-                    context.fill(Path(highlightRect), with: .color(Color.blue.opacity(0.5)))
-                } else if element is UMLElement{
-                    context.stroke(Path(highlightRect), with: .color(Color.blue.opacity(0.5)), lineWidth: 5)
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .left), with: .color(Color.blue.opacity(0.5)))
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .right), with: .color(Color.blue.opacity(0.5)))
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .up), with: .color(Color.blue.opacity(0.5)))
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .down), with: .color(Color.blue.opacity(0.5)))
+                if selectedElement is UMLRelationship {
+                    context.fill(Path(highlightRect), with: .color(.blue.opacity(0.5)))
+                } else if selectedElement is UMLElement{
+                    context.stroke(Path(highlightRect), with: .color(.blue.opacity(0.5)), lineWidth: 5)
+                    context.fill(halfCircleHighlight(bounds: bounds, direction: .left), with: .color(.blue.opacity(0.5)))
+                    context.fill(halfCircleHighlight(bounds: bounds, direction: .right), with: .color(.blue.opacity(0.5)))
+                    context.fill(halfCircleHighlight(bounds: bounds, direction: .up), with: .color(.blue.opacity(0.5)))
+                    context.fill(halfCircleHighlight(bounds: bounds, direction: .down), with: .color(.blue.opacity(0.5)))
                 }
             }
         }
@@ -182,7 +182,7 @@ open class ApollonEditViewModel: ApollonViewModel {
     @MainActor
     func addAttributeOrMethod(name: String, type: UMLElementType) {
         guard let elements = umlModel?.elements, let children = (self.selectedElement as? UMLElement)?.verticallySortedChildren else {
-            //log.warning("Could not find elements in the model")
+            log.warning("Could not find elements in the model")
             return
         }
         var newBounds: Boundary?
@@ -241,43 +241,12 @@ open class ApollonEditViewModel: ApollonViewModel {
     
     @MainActor
     func addElement(type: UMLElementType) {
-        if let width = umlModel?.size?.width {
-            if let height = umlModel?.size?.height {
-                let middleWidth = width / 2
-                let middleHeight = height / 2
-                let elementID = UUID().uuidString
-                
-                switch type {
-                case .package:
-                    let element = UMLElement(id: elementID, name: type.rawValue, type: type, owner: nil, bounds: Boundary(x: middleWidth, y: middleHeight, width: 200, height: 100), assessmentNote: nil)
-                    umlModel?.elements?.append(element)
-                case .Class:
-                    let element = UMLElement(id: elementID, name: type.rawValue, type: type, owner: nil, bounds: Boundary(x: middleWidth, y: middleHeight, width: 200, height: 120), assessmentNote: nil)
-                    let elementAttribute = UMLElement(id: UUID().uuidString, name: "+ attribute: Type", type: UMLElementType.classAttribute, owner: elementID, bounds: Boundary(x: middleWidth, y: middleHeight + 40, width: 200, height: 40), assessmentNote: nil)
-                    let elementMethod = UMLElement(id: UUID().uuidString, name: "+ method()", type: UMLElementType.classMethod, owner: elementID, bounds: Boundary(x: middleWidth, y: middleHeight + 80, width: 200, height: 40), assessmentNote: nil)
-                    umlModel?.elements?.append(element)
-                    umlModel?.elements?.append(elementAttribute)
-                    umlModel?.elements?.append(elementMethod)
-                case .abstractClass, .interface:
-                    let element = UMLElement(id: elementID, name: type.rawValue, type: type, owner: nil, bounds: Boundary(x: middleWidth, y: middleHeight, width: 200, height: 130), assessmentNote: nil)
-                    let elementAttribute = UMLElement(id: UUID().uuidString, name: "+ attribute: Type", type: UMLElementType.classAttribute, owner: elementID, bounds: Boundary(x: middleWidth, y: middleHeight + 50, width: 200, height: 40), assessmentNote: nil)
-                    let elementMethod = UMLElement(id: UUID().uuidString, name: "+ method()", type: UMLElementType.classMethod, owner: elementID, bounds: Boundary(x: middleWidth, y: middleHeight + 90, width: 200, height: 40), assessmentNote: nil)
-                    umlModel?.elements?.append(element)
-                    umlModel?.elements?.append(elementAttribute)
-                    umlModel?.elements?.append(elementMethod)
-                case .enumeration:
-                    let element = UMLElement(id: elementID, name: type.rawValue, type: type, owner: nil, bounds: Boundary(x: middleWidth, y: middleHeight, width: 200, height: 170), assessmentNote: nil)
-                    let elementAttribute1 = UMLElement(id: UUID().uuidString, name: "Case 1", type: UMLElementType.classAttribute, owner: elementID, bounds: Boundary(x: middleWidth, y: middleHeight + 50, width: 200, height: 40), assessmentNote: nil)
-                    let elementAttribute2 = UMLElement(id: UUID().uuidString, name: "Case 2", type: UMLElementType.classAttribute, owner: elementID, bounds: Boundary(x: middleWidth, y: middleHeight + 90, width: 200, height: 40), assessmentNote: nil)
-                    let elementAttribute3 = UMLElement(id: UUID().uuidString, name: "Case 3", type: UMLElementType.classAttribute, owner: elementID, bounds: Boundary(x: middleWidth, y: middleHeight + 130, width: 200, height: 40), assessmentNote: nil)
-                    umlModel?.elements?.append(element)
-                    umlModel?.elements?.append(elementAttribute1)
-                    umlModel?.elements?.append(elementAttribute2)
-                    umlModel?.elements?.append(elementAttribute3)
-                default:
-                    return
-                }
-            }
+        let middle = CGPoint(x: diagramSize.width / 2, y: diagramSize.height / 2)
+        let elementCreator = ElementCreatorFactory.createElementCreator(for: type)
+        if let elementCreator {
+            umlModel?.elements?.append(contentsOf: elementCreator.createAllElements(for: type, middle: middle))
+        } else {
+            log.error("Attempted to create an unknown element")
         }
         determineChildren()
     }

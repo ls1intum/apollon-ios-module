@@ -31,7 +31,7 @@ struct UMLRendererEdit: View {
                     viewModel.render(&context, size: size)
                 }
                 Canvas(rendersAsynchronously: true) { context, size in
-                    viewModel.renderHighlights(&context, size: size)
+                    viewModel.renderSelectedElement(&context, size: size)
                 }.onTapGesture { tapLocation in
                     viewModel.selectItem(at: tapLocation)
                     if let bounds = viewModel.selectedElement?.bounds {

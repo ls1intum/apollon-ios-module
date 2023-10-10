@@ -18,13 +18,13 @@ public enum UMLDiagramType: String, Codable {
     public var diagramElementTypes: [UMLElementType] {
         switch self {
         case .classDiagram:
-            return [.enumeration, .interface, .abstractClass, .Class, .package]
+            return [.Class, .abstractClass, .interface, .enumeration, .package]
         case .objectDiagram:
             return [.objectName]
         case .activityDiagram:
             return [.activityForkNodeHorizontal, .activityForkNode, .activityMergeNode, .activityObjectNode, .activityActionNode, .activityFinalNode, .activityInitialNode, .activity]
         case .useCaseDiagram:
-            return [.useCaseSystem, .useCaseActor, .useCase]
+            return [.useCaseActor, .useCase, .useCaseSystem]
         case .communicationDiagram:
             return [.objectName]
         case .componentDiagram:
