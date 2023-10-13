@@ -1,21 +1,19 @@
 import SwiftUI
 
-struct ResetZoomAndLocationButton: View {
-    @StateObject var viewModel: ApollonEditViewModel
+struct SubmitButton: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var body: some View {
         Button {
-            viewModel.setDragLocation()
-            viewModel.scale = viewModel.minScale
-            viewModel.progressingScale = 1.0
+            presentationMode.wrappedValue.dismiss()
         } label: {
-            Image(systemName: "scope")
+            Image(systemName: "checkmark")
                 .frame(width: 25, height: 25)
                 .foregroundColor(.white)
                 .padding(5)
                 .background {
                     RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.green)
                 }
         }
     }

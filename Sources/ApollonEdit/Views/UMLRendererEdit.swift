@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct UMLRendererEdit: View {
-    @StateObject public var viewModel: ApollonEditViewModel
+    @StateObject var viewModel: ApollonEditViewModel
     @State private var startLocation: CGPoint?
     @State private var startDragLocation = CGPoint.zero
     @State private var dragStarted = true
@@ -15,9 +15,6 @@ struct UMLRendererEdit: View {
                     newLocation.y += value.translation.height
                     viewModel.updateElementPosition(location: newLocation, drag: value)
                 }
-            }.onEnded { value in
-                startLocation?.x += value.translation.width
-                startLocation?.y += value.translation.height
             }
     }
     
@@ -77,6 +74,10 @@ struct UMLRendererEdit: View {
         if viewModel.progressingScale * viewModel.scale < viewModel.minScale {
             viewModel.progressingScale = viewModel.minScale / viewModel.scale
         }
+        // Enforce zoom in limit
+        if viewModel.progressingScale * viewModel.scale > viewModel.maxScale {
+            viewModel.progressingScale = viewModel.maxScale / viewModel.scale
+        }
     }
     
     private func handleMagnificationEnd(_ finalScale: MagnificationGesture.Value) {
@@ -86,6 +87,10 @@ struct UMLRendererEdit: View {
         // Enforce zoom out limit
         if viewModel.scale < viewModel.minScale {
             viewModel.scale = viewModel.minScale
+        }
+        // Enforce zoom in limit
+        if viewModel.scale > viewModel.maxScale {
+            viewModel.scale = viewModel.maxScale
         }
     }
 }

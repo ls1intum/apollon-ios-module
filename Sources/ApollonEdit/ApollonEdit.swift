@@ -3,12 +3,13 @@ import ApollonShared
 
 public struct ApollonEdit: View {
     @StateObject var viewModel = ApollonEditViewModel()
+    @State private var isShowingAddElementMenu: Bool = false
     var umlModel: UMLModel
     var diagramType: UMLDiagramType
     var fontSize: CGFloat
     var diagramOffset: CGPoint
     var isGridBackground: Bool
-
+    
     public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
         self.umlModel = umlModel
         self.diagramType = diagramType
@@ -16,24 +17,44 @@ public struct ApollonEdit: View {
         self.diagramOffset = diagramOffset
         self.isGridBackground = isGridBackground
     }
-
+    
     public var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .topLeading) {
-                UMLRendererEdit(viewModel: viewModel)
-                HStack {
-                    ResetZoomAndLocationButton(viewModel: viewModel)
-                    if viewModel.selectedElement != nil {
-                        EditSelectedItemButton(viewModel: viewModel)
+            NavigationStack {
+                ZStack(alignment: .topLeading) {
+                    UMLRendererEdit(viewModel: viewModel)
+                    VStack (alignment: .leading) {
+                        HStack {
+                            Spacer()
+                            if isShowingAddElementMenu {
+                                ElementAddView(viewModel: viewModel)
+                            }
+                        }
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            MagnificationToolbar(viewModel: viewModel)
+                        }
+                    }.padding()
+                }.onAppear() {
+                    viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
+                    viewModel.setupScale(geometrySize: geometry.size)
+                }.onChange(of: fontSize) { newValue in
+                    viewModel.fontSize = newValue
+                }
+                .navigationTitle(diagramType.rawValue)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        SubmitButton()
                     }
-                    Spacer()
-                    MenuButton(viewModel: viewModel)
-                }.padding()
-            }.onAppear() {
-                viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
-                viewModel.setupScale(geometrySize: geometry.size)
-            }.onChange(of: fontSize) { newValue in
-                viewModel.fontSize = newValue
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        HStack(spacing: 1) {
+                            EditSelectedItemButton(viewModel: viewModel)
+                            ProblemStatementButton(viewModel: viewModel)
+                            AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
+                        }
+                    }
+                }
             }
         }
     }

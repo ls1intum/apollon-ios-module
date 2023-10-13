@@ -9,8 +9,8 @@ open class ApollonEditViewModel: ApollonViewModel {
     @Published var currentDragLocation = CGPoint.zero
     @Published var scale: CGFloat = 1.0
     @Published var progressingScale: CGFloat = 1.0
-    @Published var minScale: CGFloat = 0.3
-    @Published var maxScale: CGFloat = 5.0
+    @Published var minScale: CGFloat = 0.1
+    @Published var maxScale: CGFloat = 4.0
     
     @MainActor
     var diagramSize: CGSize {
@@ -125,45 +125,44 @@ open class ApollonEditViewModel: ApollonViewModel {
             selectedElement?.bounds?.x = location.x
             selectedElement?.bounds?.y = location.y
             
-            //            if let relationships = diagram?.model?.relationships {
-            //                for (index, relationship) in relationships.enumerated() {
-            //                    if var bounds = relationship.bounds {
-            //                        if relationship.source?.element == element.id {
-            ////                            if var path = relationship.path {
-            ////                                if path.count >= 2 {
-            ////                                    var pathFirst = path.first
-            ////                                    var pathLast = path.last
-            ////                                }
-            ////                                for (pathIndex, _) in path.enumerated() where pathIndex > 0{
-            ////                                    path[pathIndex].x += drag.translation.width
-            ////                                    path[pathIndex].y += drag.translation.height
-            ////                                }
-            ////                                diagram?.model?.relationships?[index].path = path
-            ////                            }
-            //                            //bounds.x = location.x
-            //                            //bounds.y = location.y
-            ////                            bounds.width = drag.translation.width
-            ////                            bounds.height = drag.translation.height
-            //                            diagram?.model?.relationships?[index].bounds = bounds
-            //                        } else if relationship.target?.element == element.id {
-            //                            if var path = relationship.path {
-            //                                path.last.x =
-            //                                path.last.y =
-            //                                for (pathIndex, _) in path.enumerated() where pathIndex > 0 {
-            //                                    path[pathIndex].x += drag.translation.width
-            //                                    path[pathIndex].y += drag.translation.height
-            //                                }
-            //                                diagram?.model?.relationships?[index].path = path
-            //                            }
-            ////                            let newWidth = bounds.width + (bounds.x - location.x)
-            ////                            let newHeight = bounds.height + (bounds.y - location.y)
-            ////                            bounds.width = newWidth
-            ////                            bounds.height = newHeight
-            //                            diagram?.model?.relationships?[index].bounds = bounds
-            //                        }
-            //                    }
-            //                }
-            //            }
+//            if let relationships = umlModel?.relationships {
+//                for (index, relationship) in relationships.enumerated() {
+//                    if var bounds = relationship.bounds {
+//                        if relationship.source?.element == element.id {
+//                            if var path = relationship.path {
+//                                var pathFirst = path.first
+//                                var pathLast = path.last
+//                                
+//                                for (pathIndex, _) in path.enumerated() where pathIndex > 0{
+//                                    path[pathIndex].x += drag.translation.width
+//                                    path[pathIndex].y += drag.translation.height
+//                                }
+//                                umlModel?.relationships?[index].path = path
+//                            }
+//                            bounds.x = location.x
+//                            bounds.y = location.y
+//                            bounds.width = drag.translation.width
+//                            bounds.height = drag.translation.height
+//                            umlModel?.relationships?[index].bounds = bounds
+//                        } else if relationship.target?.element == element.id {
+//                            if var path = relationship.path {
+//                                var pathFirst = path.first
+//                                var pathLast = path.last
+//                                for (pathIndex, _) in path.enumerated() where pathIndex > 0 {
+//                                    path[pathIndex].x += drag.translation.width
+//                                    path[pathIndex].y += drag.translation.height
+//                                }
+//                                umlModel?.relationships?[index].path = path
+//                            }
+//                            let newWidth = bounds.width + (bounds.x - location.x)
+//                            let newHeight = bounds.height + (bounds.y - location.y)
+//                            bounds.width = newWidth
+//                            bounds.height = newHeight
+//                            umlModel?.relationships?[index].bounds = bounds
+//                        }
+//                    }
+//                }
+//            }
             
             if var offset = element.bounds?.height, let elements = umlModel?.elements, let children = element.verticallySortedChildren {
                 for child in children.reversed() {

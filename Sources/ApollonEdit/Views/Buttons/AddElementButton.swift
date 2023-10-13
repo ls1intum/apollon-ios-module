@@ -1,14 +1,14 @@
 import SwiftUI
 
-struct EditSelectedItemButton: View {
+struct AddElementButton: View {
     @StateObject var viewModel: ApollonEditViewModel
-    @State private var isShowingPopup: Bool = false
+    @Binding var isAddElementMenuVisible: Bool
     
     var body: some View {
         Button {
-            isShowingPopup.toggle()
+            isAddElementMenuVisible.toggle()
         } label: {
-            Image(systemName: "slider.horizontal.3")
+            Image(systemName: "rectangle.stack.fill.badge.plus")
                 .frame(width: 25, height: 25)
                 .foregroundColor(.white)
                 .padding(5)
@@ -16,8 +16,6 @@ struct EditSelectedItemButton: View {
                     RoundedRectangle(cornerRadius: 5)
                         .foregroundColor(.blue)
                 }
-        }.sheet(isPresented: $isShowingPopup) {
-            ElementEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)
         }
     }
 }
