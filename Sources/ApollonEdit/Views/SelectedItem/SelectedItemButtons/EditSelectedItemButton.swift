@@ -14,16 +14,15 @@ struct EditSelectedItemButton: View {
                 .foregroundColor(.white)
                 .padding(5)
                 .background {
-                    RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(viewModel.selectedElement == nil ? .gray : .blue)
+                    Circle()
+                        .foregroundColor(.blue)
                 }
-        }.disabled(viewModel.selectedElement == nil)
-        .sheet(isPresented: $isShowingPopup) {
+        }.sheet(isPresented: $isShowingPopup) {
             if viewModel.selectedElement is UMLElement {
                 ElementEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)
             } else if viewModel.selectedElement is UMLRelationship {
                 RelationshipEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)
             }
-        }
+        }.position(viewModel.editSelectedItemButtonPosition)
     }
 }

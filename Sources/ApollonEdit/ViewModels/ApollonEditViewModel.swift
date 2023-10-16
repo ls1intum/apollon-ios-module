@@ -11,10 +11,39 @@ open class ApollonEditViewModel: ApollonViewModel {
     @Published var progressingScale: CGFloat = 1.0
     @Published var minScale: CGFloat = 0.1
     @Published var maxScale: CGFloat = 4.0
+    @Published var selectedElementBounds: Boundary?
+    @Published var moveSelectedItemButtonPosition: CGPoint?
     
     @MainActor
     var diagramSize: CGSize {
         umlModel?.size?.asCGSize ?? CGSize()
+    }
+    
+    @MainActor
+    var editSelectedItemButtonPosition: CGPoint {
+        if let bounds = selectedElementBounds {
+            return CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y - 50)
+        }
+        return CGPoint(x: 0, y: 0)
+    }
+    
+    @MainActor
+    func moveSelectedItemButton(position: CGPoint? = nil) {
+        if let bounds = selectedElementBounds {
+            if let position {
+                moveSelectedItemButtonPosition = position
+            } else {
+                moveSelectedItemButtonPosition = CGPoint(x: bounds.x - 25, y: bounds.y + (bounds.height + 25))
+            }
+        }
+    }
+    
+    @MainActor
+    var resizeSelectedItemButtonPosition: CGPoint {
+        if let bounds = selectedElementBounds {
+            return CGPoint(x: bounds.x + (bounds.width + 25), y: bounds.y + (bounds.height + 25))
+        }
+        return CGPoint(x: 0, y: 0)
     }
     
     @MainActor
@@ -43,14 +72,18 @@ open class ApollonEditViewModel: ApollonViewModel {
         selectedElement = getSelectableItem(at: point)
     }
     
+    @MainActor
     private func getSelectableItem(at point: CGPoint) -> SelectableUMLItem? {
         /// Check for UMLRelationship
         if let relationship = umlModel?.relationships?.first(where: { $0.boundsContains(point: point) }) {
+            self.selectedElementBounds = relationship.bounds
             return relationship
         }
         /// Check for UMLElement
         if let elements = umlModel?.elements {
             for element in elements where element.boundsContains(point: point) {
+                self.selectedElementBounds = element.bounds
+                self.moveSelectedItemButton()
                 return element
             }
         }
@@ -67,60 +100,7 @@ open class ApollonEditViewModel: ApollonViewModel {
     }
     
     @MainActor
-    func renderSelectedElement(_ context: inout GraphicsContext, size: CGSize) {
-        if let selectedElement {
-            if let bounds = selectedElement.bounds {
-                let highlightRect = CGRect(x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height)
-                if selectedElement is UMLRelationship {
-                    context.fill(Path(highlightRect), with: .color(.blue.opacity(0.5)))
-                } else if selectedElement is UMLElement{
-                    context.stroke(Path(highlightRect), with: .color(.blue.opacity(0.5)), lineWidth: 5)
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .left), with: .color(.blue.opacity(0.5)))
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .right), with: .color(.blue.opacity(0.5)))
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .up), with: .color(.blue.opacity(0.5)))
-                    context.fill(halfCircleHighlight(bounds: bounds, direction: .down), with: .color(.blue.opacity(0.5)))
-                }
-            }
-        }
-    }
-    
-    private func halfCircleHighlight(bounds: Boundary, direction: Direction) -> Path {
-        var x, y, startAngle, endAngle: Double
-        switch direction {
-        case .left:
-            startAngle = 270
-            endAngle = 90
-            x = bounds.x
-            y = bounds.y + bounds.height / 2
-        case .right:
-            startAngle = 90
-            endAngle = 270
-            x = bounds.x + bounds.width
-            y = bounds.y + bounds.height / 2
-        case .up:
-            startAngle = 0
-            endAngle = 180
-            x = bounds.x + bounds.width / 2
-            y = bounds.y
-        case .down:
-            startAngle = 180
-            endAngle = 0
-            x = bounds.x + bounds.width / 2
-            y = bounds.y + bounds.height
-        default:
-            return Path()
-        }
-        return Path { path in
-            path.addArc(center: CGPoint(x: x, y: y),
-                        radius: 20,
-                        startAngle: .degrees(startAngle),
-                        endAngle: .degrees(endAngle),
-                        clockwise: true)
-        }
-    }
-    
-    @MainActor
-    func updateElementPosition(location: CGPoint, drag: DragGesture.Value) {
+    func updateElementPosition(location: CGPoint) {
         if let element = selectedElement as? UMLElement {
             selectedElement?.bounds?.x = location.x
             selectedElement?.bounds?.y = location.y

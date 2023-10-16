@@ -3,20 +3,9 @@ import ApollonShared
 
 struct UMLRendererEdit: View {
     @StateObject var viewModel: ApollonEditViewModel
-    @State private var startLocation: CGPoint?
     @State private var startDragLocation = CGPoint.zero
     @State private var dragStarted = true
-    
-    var elementDrag: some Gesture {
-        DragGesture()
-            .onChanged { value in
-                if var newLocation = startLocation {
-                    newLocation.x += value.translation.width
-                    newLocation.y += value.translation.height
-                    viewModel.updateElementPosition(location: newLocation, drag: value)
-                }
-            }
-    }
+    @State private var elementDragStarted = false
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -27,14 +16,16 @@ struct UMLRendererEdit: View {
                 Canvas(rendersAsynchronously: true) { context, size in
                     viewModel.render(&context, size: size)
                 }
-                Canvas(rendersAsynchronously: true) { context, size in
-                    viewModel.renderSelectedElement(&context, size: size)
-                }.onTapGesture { tapLocation in
+                .onTapGesture { tapLocation in
                     viewModel.selectItem(at: tapLocation)
-                    if let bounds = viewModel.selectedElement?.bounds {
-                        startLocation = CGPoint(x: bounds.x, y: bounds.y)
+                }
+                if viewModel.selectedElement != nil {
+                    if viewModel.selectedElement is UMLElement {
+                        SelectedElementView(viewModel: viewModel, elementDragStarted: $elementDragStarted)
+                    } else if viewModel.selectedElement is UMLRelationship {
+                        SelectedRelationshipView(viewModel: viewModel)
                     }
-                }.highPriorityGesture(viewModel.selectedElement != nil ? elementDrag : nil)
+                }
             }.frame(minWidth: viewModel.diagramSize.width, minHeight: viewModel.diagramSize.height)
                 .padding()
                 .scaleEffect(viewModel.scale * viewModel.progressingScale)
@@ -42,7 +33,7 @@ struct UMLRendererEdit: View {
         }.onChange(of: viewModel.diagramSize) { _ in
             viewModel.setDragLocation()
         }.gesture(
-            viewModel.selectedElement == nil ?
+            !elementDragStarted ?
             DragGesture()
                 .onChanged(handleDrag)
                 .onEnded { _ in
@@ -50,7 +41,7 @@ struct UMLRendererEdit: View {
                 }
             : nil
         ).simultaneousGesture(
-            viewModel.selectedElement == nil ?
+            !elementDragStarted ?
             MagnificationGesture()
                 .onChanged(handleMagnification)
                 .onEnded(handleMagnificationEnd)

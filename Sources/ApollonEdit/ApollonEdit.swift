@@ -41,15 +41,12 @@ public struct ApollonEdit: View {
                     viewModel.setupScale(geometrySize: geometry.size)
                 }.onChange(of: fontSize) { newValue in
                     viewModel.fontSize = newValue
-                }
-                .navigationTitle(diagramType.rawValue)
-                .toolbar {
+                }.toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         SubmitButton()
                     }
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         HStack(spacing: 1) {
-                            EditSelectedItemButton(viewModel: viewModel)
                             ProblemStatementButton(viewModel: viewModel)
                             AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
                         }
