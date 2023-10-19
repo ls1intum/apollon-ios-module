@@ -26,7 +26,7 @@ public enum UMLDiagramType: String, Codable {
         case .useCaseDiagram:
             return [.useCaseActor, .useCase, .useCaseSystem]
         case .communicationDiagram:
-            return [.objectName]
+            return [.communicationLinkMessage]
         case .componentDiagram:
             return [.componentInterface, .component]
         case .deploymentDiagram:
@@ -39,6 +39,34 @@ public enum UMLDiagramType: String, Codable {
             return [.syntaxTreeNonterminal, .syntaxTreeTerminal]
         case .flowchart:
             return [.flowchartFunctionCall, .flowchartInputOutput, .flowchartDecision, .flowchartProcess, .flowchartTerminal]
+        }
+    }
+    
+    /// The different relationships of each diagram, that the user can create
+    public var diagramRelationshipTypes: [UMLRelationshipType] {
+        switch self {
+        case .classDiagram:
+            return [.classAggregation, .classUnidirectional, .classBidirectional, .classComposition, .classDependency, .classInheritance, .classRealization]
+        case .objectDiagram:
+            return [.objectLink]
+        case .activityDiagram:
+            return [.activityControlFlow]
+        case .useCaseDiagram:
+            return [.useCaseAssociation, .useCaseGeneralization, .useCaseInclude, .useCaseExtend]
+        case .communicationDiagram:
+            return [.communicationLink]
+        case .componentDiagram:
+            return [.componentDependency, .componentInterfaceProvided, .componentInterfaceRequired]
+        case .deploymentDiagram:
+            return [.deploymentAssociation, .deploymentDependency, .deploymentInterfaceProvided, .deploymentInterfaceRequired]
+        case .petriNet:
+            return [.petriNetArc]
+        case .reachabilityGraph:
+            return [.reachabilityGraphArc]
+        case .syntaxTree:
+            return [.syntaxTreeLink]
+        case .flowchart:
+            return [.flowchartFlowline]
         }
     }
     

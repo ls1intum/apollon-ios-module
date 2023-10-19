@@ -17,7 +17,10 @@ struct EditSelectedItemButton: View {
                     Circle()
                         .foregroundColor(.blue)
                 }
-        }.sheet(isPresented: $isShowingPopup) {
+        }.sheet(isPresented: $isShowingPopup, onDismiss: {
+            isShowingPopup = false
+            viewModel.selectedElement = nil
+        }) {
             if viewModel.selectedElement is UMLElement {
                 ElementEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)
             } else if viewModel.selectedElement is UMLRelationship {

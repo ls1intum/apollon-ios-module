@@ -22,7 +22,11 @@ open class ApollonEditViewModel: ApollonViewModel {
     @MainActor
     var editSelectedItemButtonPosition: CGPoint {
         if let bounds = selectedElementBounds {
-            return CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y - 50)
+            if selectedElement is UMLElement {
+                return CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y - 50)
+            } else if selectedElement is UMLRelationship {
+                return CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2))
+            }
         }
         return CGPoint(x: 0, y: 0)
     }
@@ -96,6 +100,7 @@ open class ApollonEditViewModel: ApollonViewModel {
         umlModel?.elements?.removeAll { $0.id ?? "" == self.selectedElement?.id ?? ""}
         umlModel?.relationships?.removeAll {$0.source?.element ?? "" == self.selectedElement?.id ?? ""}
         umlModel?.relationships?.removeAll {$0.target?.element ?? "" == self.selectedElement?.id ?? ""}
+        umlModel?.relationships?.removeAll {$0.id ?? "" == self.selectedElement?.id ?? ""}
         self.selectedElement = nil
     }
     
@@ -108,38 +113,20 @@ open class ApollonEditViewModel: ApollonViewModel {
 //            if let relationships = umlModel?.relationships {
 //                for (index, relationship) in relationships.enumerated() {
 //                    if var bounds = relationship.bounds {
+//                        // SOURCE ELEMENT
 //                        if relationship.source?.element == element.id {
 //                            if var path = relationship.path {
-//                                var pathFirst = path.first
-//                                var pathLast = path.last
-//                                
-//                                for (pathIndex, _) in path.enumerated() where pathIndex > 0{
-//                                    path[pathIndex].x += drag.translation.width
-//                                    path[pathIndex].y += drag.translation.height
-//                                }
-//                                umlModel?.relationships?[index].path = path
 //                            }
-//                            bounds.x = location.x
-//                            bounds.y = location.y
-//                            bounds.width = drag.translation.width
-//                            bounds.height = drag.translation.height
-//                            umlModel?.relationships?[index].bounds = bounds
+//                            // TARGET ELEMENT
 //                        } else if relationship.target?.element == element.id {
 //                            if var path = relationship.path {
-//                                var pathFirst = path.first
-//                                var pathLast = path.last
-//                                for (pathIndex, _) in path.enumerated() where pathIndex > 0 {
-//                                    path[pathIndex].x += drag.translation.width
-//                                    path[pathIndex].y += drag.translation.height
-//                                }
-//                                umlModel?.relationships?[index].path = path
 //                            }
-//                            let newWidth = bounds.width + (bounds.x - location.x)
-//                            let newHeight = bounds.height + (bounds.y - location.y)
-//                            bounds.width = newWidth
-//                            bounds.height = newHeight
-//                            umlModel?.relationships?[index].bounds = bounds
 //                        }
+//                        let newWidth = bounds.width + (bounds.x - location.x)
+//                        let newHeight = bounds.height + (bounds.y - location.y)
+//                        bounds.width = newWidth
+//                        bounds.height = newHeight
+//                        umlModel?.relationships?[index].bounds = bounds
 //                    }
 //                }
 //            }
@@ -228,5 +215,12 @@ open class ApollonEditViewModel: ApollonViewModel {
             log.error("Attempted to create an unknown element")
         }
         determineChildren()
+    }
+    
+    func getElementTypeById(elementId: String) -> UMLElementType? {
+        if let element = umlModel?.elements?.first(where: { $0.id == elementId }) {
+            return element.type ?? nil
+        }
+        return nil
     }
 }

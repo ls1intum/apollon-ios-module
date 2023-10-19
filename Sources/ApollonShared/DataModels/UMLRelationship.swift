@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// Contains all information of a specific UML relationship
-public struct UMLRelationship: Codable, SelectableUMLItem {
+public class UMLRelationship: Codable, SelectableUMLItem {
     public let id: String?
     public var name: String?
     public var type: UMLRelationshipType?
@@ -124,10 +124,10 @@ public struct PathPoint: Codable {
 }
 
 public struct UMLRelationshipEndPoint: Codable {
-    /// The id of the UML element that the endpoint is attached to
-    public var element: String?
     /// Indicates the side, from which the endpoint is attached to the UML element
     public var direction: Direction?
+    /// The id of the UML element that the endpoint is attached to
+    public var element: String?
     /// The multiplicity of the relationship
     public var multiplicity: String?
     /// The role of the relationship

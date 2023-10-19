@@ -11,6 +11,7 @@ struct ElementAddView: View {
                 } label: {
                     Image(type.rawValue, bundle: .module)
                         .resizable()
+                        .aspectRatio(contentMode: .fit)
                         .scaledToFit()
                 }
             }
