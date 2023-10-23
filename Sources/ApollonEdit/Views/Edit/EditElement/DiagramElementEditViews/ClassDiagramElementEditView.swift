@@ -81,6 +81,7 @@ struct ClassDiagramElementEditView: View {
                     } else {
                         selectedButton = 1
                         (viewModel.selectedElement as? UMLElement)?.type = .interface
+                        
                     }
                 }) {
                     Text("Interface").padding(10)

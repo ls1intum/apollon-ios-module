@@ -22,8 +22,8 @@ public struct ApollonView: View {
             UMLRendererView(viewModel: viewModel)
         }.onAppear() {
             viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
-        }.onChange(of: fontSize) { newValue in
-            viewModel.fontSize = newValue
+        }.onChange(of: fontSize) {
+            viewModel.fontSize = fontSize
         }
     }
 }

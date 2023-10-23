@@ -9,13 +9,18 @@ struct ProblemStatementButton: View {
             isShowingProblemStatement.toggle()
         } label: {
             Image(systemName: "newspaper")
-                .frame(width: 25, height: 25)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
                 .foregroundColor(.white)
                 .padding(5)
                 .background {
                     RoundedRectangle(cornerRadius: 5)
                         .foregroundColor(.blue)
                 }
-        }.sheet(isPresented: $isShowingProblemStatement) {}
+        }.sheet(isPresented: $isShowingProblemStatement) {
+            VStack(alignment: .center) {
+                viewModel.problemStatementView
+            }
+        }
     }
 }

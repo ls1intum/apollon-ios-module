@@ -12,13 +12,12 @@ struct ElementAddView: View {
                     Image(type.rawValue, bundle: .module)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .scaledToFit()
                 }
             }
-        }.frame(width: viewModel.geometrySize.width / 3, height: viewModel.geometrySize.height / 3)
+        }.frame(maxWidth: viewModel.geometrySize.width / 3, maxHeight: viewModel.geometrySize.height / 3)
         .background {
             RoundedRectangle(cornerRadius: 5)
                 .foregroundColor(.gray)
-        }
+        }.padding(5)
     }
 }

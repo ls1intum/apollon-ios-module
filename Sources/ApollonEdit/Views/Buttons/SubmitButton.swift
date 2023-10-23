@@ -7,14 +7,14 @@ struct SubmitButton: View {
         Button {
             presentationMode.wrappedValue.dismiss()
         } label: {
-            Text("Submit")
-                .frame(width: 60, height: 25)
-                .foregroundColor(.white)
-                .padding(5)
-                .background {
-                    RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(.blue)
-                }
+            ZStack {
+                RoundedRectangle(cornerRadius: 5)
+                    .foregroundColor(.blue)
+                
+                Text("Submit")
+                    .foregroundColor(.white)
+                    .padding(5)
+            }
         }
     }
 }

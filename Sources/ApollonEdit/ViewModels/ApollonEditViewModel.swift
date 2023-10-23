@@ -5,49 +5,31 @@ import ApollonShared
 
 open class ApollonEditViewModel: ApollonViewModel {
     @Published var selectedElement: SelectableUMLItem?
+    @Published var selectedElementBounds: Boundary?
+    @Published var problemStatementView: AnyView?
     @Published var geometrySize = CGSize.zero
     @Published var currentDragLocation = CGPoint.zero
     @Published var scale: CGFloat = 1.0
     @Published var progressingScale: CGFloat = 1.0
-    @Published var minScale: CGFloat = 0.1
-    @Published var maxScale: CGFloat = 4.0
-    @Published var selectedElementBounds: Boundary?
-    @Published var moveSelectedItemButtonPosition: CGPoint?
+    @Published var idealScale: CGFloat = 1.0
+    @Published var minScale: CGFloat = 0.2
+    @Published var maxScale: CGFloat = 3.0
+    @Published var currentDiagramSize: CGSize = .zero
+    
+    @MainActor
+    public func setup(umlModel: UMLModel, diagramType: UMLDiagramType?, fontSize: CGFloat?, diagramOffset: CGPoint?, isGridBackground: Bool?, problemStatementView: AnyView?) {
+        super.umlModel = umlModel
+        super.diagramType = diagramType ?? umlModel.type
+        super.fontSize = fontSize ?? 14.0
+        super.diagramOffset = diagramOffset ?? CGPoint(x: 0, y: 0)
+        super.isGridBackground = isGridBackground ?? false
+        self.problemStatementView = problemStatementView ?? AnyView(EmptyView())
+        super.determineChildren()
+    }
     
     @MainActor
     var diagramSize: CGSize {
         umlModel?.size?.asCGSize ?? CGSize()
-    }
-    
-    @MainActor
-    var editSelectedItemButtonPosition: CGPoint {
-        if let bounds = selectedElementBounds {
-            if selectedElement is UMLElement {
-                return CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y - 50)
-            } else if selectedElement is UMLRelationship {
-                return CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2))
-            }
-        }
-        return CGPoint(x: 0, y: 0)
-    }
-    
-    @MainActor
-    func moveSelectedItemButton(position: CGPoint? = nil) {
-        if let bounds = selectedElementBounds {
-            if let position {
-                moveSelectedItemButtonPosition = position
-            } else {
-                moveSelectedItemButtonPosition = CGPoint(x: bounds.x - 25, y: bounds.y + (bounds.height + 25))
-            }
-        }
-    }
-    
-    @MainActor
-    var resizeSelectedItemButtonPosition: CGPoint {
-        if let bounds = selectedElementBounds {
-            return CGPoint(x: bounds.x + (bounds.width + 25), y: bounds.y + (bounds.height + 25))
-        }
-        return CGPoint(x: 0, y: 0)
     }
     
     @MainActor
@@ -62,13 +44,54 @@ open class ApollonEditViewModel: ApollonViewModel {
     @MainActor
     func setupScale(geometrySize: CGSize) {
         self.geometrySize = geometrySize
-        
-        let scaleWidth = self.geometrySize.width / (diagramSize.width)
-        let scaleHeight = self.geometrySize.height / (diagramSize.height)
+        self.currentDiagramSize = umlModel?.size?.asCGSize ?? CGSize()
+        calculateIdealScale()
+        scale = idealScale
+    }
+    
+    @MainActor
+    func calculateIdealScale() {
+        let scaleWidth = self.geometrySize.width / max(diagramSize.width, currentDiagramSize.width)
+        let scaleHeight = self.geometrySize.height / max(diagramSize.height, currentDiagramSize.height)
         let initialScale = min(scaleWidth, scaleHeight)
-        
-        minScale = min(max(initialScale, minScale), maxScale)
-        scale = minScale
+        idealScale = min(max(initialScale, minScale), maxScale) - 0.05
+    }
+    
+    @MainActor
+    func adjustDiagramSizeForSelectedElement() {
+        var largestXBottomRight: CGFloat = 0.0
+        var largestYBottomRight: CGFloat = 0.0
+        var smallestXTopLeft: CGFloat = 0.0
+        var smallestYTopLeft: CGFloat = 0.0
+        if let elements = umlModel?.elements {
+            for element in elements {
+                if let bounds = element.bounds {
+                    if bounds.x + bounds.width > largestXBottomRight {
+                        largestXBottomRight = bounds.x + bounds.width
+                    }
+                    if bounds.y + bounds.height > largestYBottomRight {
+                        largestYBottomRight = bounds.y + bounds.height
+                    }
+                    if bounds.x < smallestXTopLeft {
+                        smallestXTopLeft = bounds.x
+                    }
+                    if bounds.y < smallestYTopLeft {
+                        smallestYTopLeft = bounds.y
+                    }
+                }
+            }
+            currentDiagramSize.width = largestXBottomRight
+            currentDiagramSize.height = largestYBottomRight
+            
+            if smallestXTopLeft < 0.0 || smallestYTopLeft < 0.0 {
+                for elementOrigin in elements {
+                    elementOrigin.bounds?.x += -(smallestXTopLeft)
+                    elementOrigin.bounds?.y += -(smallestYTopLeft)
+                }
+                currentDiagramSize.width += -(smallestXTopLeft)
+                currentDiagramSize.height += -(smallestYTopLeft)
+            }
+        }
     }
     
     @MainActor
@@ -87,7 +110,6 @@ open class ApollonEditViewModel: ApollonViewModel {
         if let elements = umlModel?.elements {
             for element in elements where element.boundsContains(point: point) {
                 self.selectedElementBounds = element.bounds
-                self.moveSelectedItemButton()
                 return element
             }
         }
@@ -140,6 +162,18 @@ open class ApollonEditViewModel: ApollonViewModel {
                             umlModel?.elements?[index].bounds?.y = location.y + offset
                         }
                     }
+                }
+            }
+        }
+    }
+    
+    @MainActor
+    func updateElementSize(drag: CGSize) {
+        if let element = selectedElement as? UMLElement {
+            selectedElement?.bounds?.width += drag.width
+            if let children = element.verticallySortedChildren {
+                for child in children {
+                    child.bounds?.width += drag.width
                 }
             }
         }

@@ -9,21 +9,23 @@ public struct ApollonEdit: View {
     var fontSize: CGFloat
     var diagramOffset: CGPoint
     var isGridBackground: Bool
+    var problemStatementView: AnyView
     
-    public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
+    public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool, problemStatementView: AnyView) {
         self.umlModel = umlModel
         self.diagramType = diagramType
         self.fontSize = fontSize
         self.diagramOffset = diagramOffset
         self.isGridBackground = isGridBackground
+        self.problemStatementView = problemStatementView
     }
     
     public var body: some View {
         GeometryReader { geometry in
             NavigationStack {
-                ZStack(alignment: .topLeading) {
+                ZStack {
                     UMLRendererEdit(viewModel: viewModel)
-                    VStack (alignment: .leading) {
+                    VStack {
                         HStack {
                             Spacer()
                             if isShowingAddElementMenu {
@@ -35,12 +37,12 @@ public struct ApollonEdit: View {
                             Spacer()
                             MagnificationToolbar(viewModel: viewModel)
                         }
-                    }.padding()
+                    }
                 }.onAppear() {
-                    viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
+                    viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground, problemStatementView: problemStatementView)
                     viewModel.setupScale(geometrySize: geometry.size)
-                }.onChange(of: fontSize) { newValue in
-                    viewModel.fontSize = newValue
+                }.onChange(of: fontSize) {
+                    viewModel.fontSize = fontSize
                 }.toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         SubmitButton()

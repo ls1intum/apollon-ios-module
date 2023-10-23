@@ -12,6 +12,7 @@ struct SelectedRelationshipView: View {
                     .frame(width: bounds.width, height: bounds.height)
                     .position(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2))
                 EditSelectedItemButton(viewModel: viewModel)
+                    .position(CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2)))
             }
         }
     }

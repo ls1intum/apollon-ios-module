@@ -8,8 +8,9 @@ struct AddElementButton: View {
         Button {
             isAddElementMenuVisible.toggle()
         } label: {
-            Image(systemName: "rectangle.stack.fill.badge.plus")
-                .frame(width: 25, height: 25)
+            Image(systemName: "plus.app")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
                 .foregroundColor(.white)
                 .padding(5)
                 .background {

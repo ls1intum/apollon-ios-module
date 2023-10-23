@@ -3,16 +3,19 @@ import ApollonShared
 
 struct UMLRendererEdit: View {
     @StateObject var viewModel: ApollonEditViewModel
+    @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
     @State private var startDragLocation = CGPoint.zero
     @State private var dragStarted = true
-    @State private var elementDragStarted = false
+    @State private var elementMoveStarted = false
+    @State private var elementResizeStarted = false
+    @State private var gridSize: CGSize = .zero
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack {
+            if viewModel.isGridBackground {
+                GridBackgroundView(gridBackgroundViewModel: gridBackgroundViewModel)
+            }
             Group {
-                if viewModel.isGridBackground {
-                    GridBackgroundView()
-                }
                 Canvas(rendersAsynchronously: true) { context, size in
                     viewModel.render(&context, size: size)
                 }
@@ -21,32 +24,37 @@ struct UMLRendererEdit: View {
                 }
                 if viewModel.selectedElement != nil {
                     if viewModel.selectedElement is UMLElement {
-                        SelectedElementView(viewModel: viewModel, elementDragStarted: $elementDragStarted)
+                        SelectedElementView(viewModel: viewModel, elementMoveStarted: $elementMoveStarted, elementResizeStarted: $elementResizeStarted)
                     } else if viewModel.selectedElement is UMLRelationship {
                         SelectedRelationshipView(viewModel: viewModel)
                     }
                 }
-            }.frame(minWidth: viewModel.diagramSize.width, minHeight: viewModel.diagramSize.height)
-                .padding()
-                .scaleEffect(viewModel.scale * viewModel.progressingScale)
-                .position(viewModel.currentDragLocation)
-        }.onChange(of: viewModel.diagramSize) { _ in
-            viewModel.setDragLocation()
-        }.gesture(
-            !elementDragStarted ?
-            DragGesture()
-                .onChanged(handleDrag)
-                .onEnded { _ in
-                    dragStarted = true
-                }
-            : nil
-        ).simultaneousGesture(
-            !elementDragStarted ?
-            MagnificationGesture()
-                .onChanged(handleMagnification)
-                .onEnded(handleMagnificationEnd)
-            : nil
-        )
+                //Rectangle().stroke(.blue, lineWidth: 1)
+            }.frame(width: max(viewModel.diagramSize.width + 1, viewModel.currentDiagramSize.width + 1),
+                    height: max(viewModel.diagramSize.height + 1, viewModel.currentDiagramSize.height + 1))
+        }.scaleEffect(viewModel.scale * viewModel.progressingScale)
+            .position(viewModel.currentDragLocation)
+            .onAppear{
+                self.gridSize = CGSize(width: viewModel.geometrySize.width * 10, height: viewModel.geometrySize.height * 10)
+                gridBackgroundViewModel.gridSize = self.gridSize
+                viewModel.setDragLocation()
+            }.onChange(of: viewModel.currentDiagramSize) {
+                viewModel.calculateIdealScale()
+            }.gesture(
+                !elementMoveStarted && !elementResizeStarted ?
+                DragGesture()
+                    .onChanged(handleDrag)
+                    .onEnded { _ in
+                        dragStarted = true
+                    }
+                : nil
+            ).simultaneousGesture(
+                !elementMoveStarted && !elementResizeStarted ?
+                MagnificationGesture()
+                    .onChanged(handleMagnification)
+                    .onEnded(handleMagnificationEnd)
+                : nil
+            )
     }
     
     private func handleDrag(_ gesture: DragGesture.Value) {

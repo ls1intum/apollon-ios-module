@@ -10,7 +10,7 @@ struct EditSelectedItemButton: View {
             isShowingPopup.toggle()
         } label: {
             Image(systemName: "slider.horizontal.3")
-                .frame(width: 25, height: 25)
+                .frame(width: 35, height: 35)
                 .foregroundColor(.white)
                 .padding(5)
                 .background {
@@ -26,6 +26,6 @@ struct EditSelectedItemButton: View {
             } else if viewModel.selectedElement is UMLRelationship {
                 RelationshipEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)
             }
-        }.position(viewModel.editSelectedItemButtonPosition)
+        }
     }
 }

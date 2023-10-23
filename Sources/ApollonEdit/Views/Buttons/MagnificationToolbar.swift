@@ -12,7 +12,8 @@ struct MagnificationToolbar: View {
                 }
             } label: {
                 Image(systemName: "minus.magnifyingglass")
-                    .frame(width: 25, height: 25)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
                     .foregroundColor(.white)
                     .padding(5)
             }
@@ -24,31 +25,34 @@ struct MagnificationToolbar: View {
                 }
             } label: {
                 Image(systemName: "plus.magnifyingglass")
-                    .frame(width: 25, height: 25)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
                     .foregroundColor(.white)
                     .padding(5)
             }
             
             Divider()
-                .frame(width: 1, height: 20)
+                .frame(width: 1)
+                .frame(maxHeight: 30)
                 .overlay(.white)
+                .padding(5)
             
             // Reset Zoom and Position button
             Button {
                 viewModel.setDragLocation()
-                viewModel.scale = viewModel.minScale
+                viewModel.scale = viewModel.idealScale
                 viewModel.progressingScale = 1.0
             } label: {
                 Image(systemName: "scope")
-                    .frame(width: 25, height: 25)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
                     .foregroundColor(.white)
                     .padding(5)
             }
-        }
-        .frame(height: 30)
-        .background {
+        }.background {
             RoundedRectangle(cornerRadius: 5)
                 .foregroundColor(.blue)
-        }
+        }.frame(maxWidth: 125, maxHeight: 30)
+            .padding(3)
     }
 }
