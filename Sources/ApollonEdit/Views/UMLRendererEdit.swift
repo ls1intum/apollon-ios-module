@@ -30,13 +30,14 @@ struct UMLRendererEdit: View {
                     }
                 }
                 //Rectangle().stroke(.blue, lineWidth: 1)
-            }.frame(width: max(viewModel.diagramSize.width + 1, viewModel.currentDiagramSize.width + 1),
-                    height: max(viewModel.diagramSize.height + 1, viewModel.currentDiagramSize.height + 1))
+            }.frame(width: max(viewModel.diagramSize.width, viewModel.currentDiagramSize.width),
+                    height: max(viewModel.diagramSize.height, viewModel.currentDiagramSize.height))
         }.scaleEffect(viewModel.scale * viewModel.progressingScale)
             .position(viewModel.currentDragLocation)
             .onAppear{
-                self.gridSize = CGSize(width: viewModel.geometrySize.width * 10, height: viewModel.geometrySize.height * 10)
-                gridBackgroundViewModel.gridSize = self.gridSize
+                gridSize = CGSize(width: viewModel.geometrySize.width * 10, height: viewModel.geometrySize.height * 10)
+                gridBackgroundViewModel.gridSize = gridSize
+                gridBackgroundViewModel.showGridBackgroundBorder = true
                 viewModel.setDragLocation()
             }.onChange(of: viewModel.currentDiagramSize) {
                 viewModel.calculateIdealScale()

@@ -16,6 +16,8 @@ enum ElementCreatorFactory {
             return EnumerationCreator()
         case .package:
             return PackageCreator()
+        case .objectName:
+            return ObjectCreator()
         case .useCaseActor:
             return UseCaseActorCreator()
         case .useCase:
@@ -56,6 +58,15 @@ struct EnumerationCreator: ElementCreator {
         let elementAttribute2 = UMLElement(name: "Case 2", type: .classAttribute, owner: elementID, bounds: Boundary(x: middle.x, y: middle.y + 90, width: 200, height: 40))
         let elementAttribute3 = UMLElement(name: "Case 3", type: .classAttribute, owner: elementID, bounds: Boundary(x: middle.x, y: middle.y + 130, width: 200, height: 40))
         return [element, elementAttribute1, elementAttribute2, elementAttribute3]
+    }
+}
+
+struct ObjectCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        let elementID = UUID().uuidString
+        let element = UMLElement(id: elementID, name: "Object", type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 70))
+        let elementAttribute = UMLElement(name: "attribute = value", type: .objectAttribute, owner: elementID, bounds: Boundary(x: middle.x, y: middle.y + 40, width: 200, height: 30))
+        return [element, elementAttribute]
     }
 }
 

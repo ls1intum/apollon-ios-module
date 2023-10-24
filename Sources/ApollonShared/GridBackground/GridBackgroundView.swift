@@ -12,9 +12,11 @@ public struct GridBackgroundView: View {
             Image("UMLGridBackground", bundle: .module)
                 .resizable(resizingMode: .tile)
                 .frame(width: gridBackgroundViewModel.gridSize.width, height: gridBackgroundViewModel.gridSize.height)
-            Rectangle()
-                .stroke(.blue, lineWidth: 4)
-                .frame(width: gridBackgroundViewModel.gridSize.width + 2, height: gridBackgroundViewModel.gridSize.height + 2)
+            if gridBackgroundViewModel.showGridBackgroundBorder {
+                Rectangle()
+                    .stroke(.blue, lineWidth: 4)
+                    .frame(width: gridBackgroundViewModel.gridSize.width + 2, height: gridBackgroundViewModel.gridSize.height + 2)
+            }
         }.ignoresSafeArea(.all)
     }
 }

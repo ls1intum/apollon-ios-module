@@ -132,26 +132,26 @@ open class ApollonEditViewModel: ApollonViewModel {
             selectedElement?.bounds?.x = location.x
             selectedElement?.bounds?.y = location.y
             
-//            if let relationships = umlModel?.relationships {
-//                for (index, relationship) in relationships.enumerated() {
-//                    if var bounds = relationship.bounds {
-//                        // SOURCE ELEMENT
-//                        if relationship.source?.element == element.id {
-//                            if var path = relationship.path {
-//                            }
-//                            // TARGET ELEMENT
-//                        } else if relationship.target?.element == element.id {
-//                            if var path = relationship.path {
-//                            }
-//                        }
-//                        let newWidth = bounds.width + (bounds.x - location.x)
-//                        let newHeight = bounds.height + (bounds.y - location.y)
-//                        bounds.width = newWidth
-//                        bounds.height = newHeight
-//                        umlModel?.relationships?[index].bounds = bounds
-//                    }
-//                }
-//            }
+            //            if let relationships = umlModel?.relationships {
+            //                for (index, relationship) in relationships.enumerated() {
+            //                    if var bounds = relationship.bounds {
+            //                        // SOURCE ELEMENT
+            //                        if relationship.source?.element == element.id {
+            //                            if var path = relationship.path {
+            //                            }
+            //                            // TARGET ELEMENT
+            //                        } else if relationship.target?.element == element.id {
+            //                            if var path = relationship.path {
+            //                            }
+            //                        }
+            //                        let newWidth = bounds.width + (bounds.x - location.x)
+            //                        let newHeight = bounds.height + (bounds.y - location.y)
+            //                        bounds.width = newWidth
+            //                        bounds.height = newHeight
+            //                        umlModel?.relationships?[index].bounds = bounds
+            //                    }
+            //                }
+            //            }
             
             if var offset = element.bounds?.height, let elements = umlModel?.elements, let children = element.verticallySortedChildren {
                 for child in children.reversed() {
@@ -174,66 +174,6 @@ open class ApollonEditViewModel: ApollonViewModel {
             if let children = element.verticallySortedChildren {
                 for child in children {
                     child.bounds?.width += drag.width
-                }
-            }
-        }
-    }
-    
-    @MainActor
-    func addAttributeOrMethod(name: String, type: UMLElementType) {
-        guard let elements = umlModel?.elements, let children = (self.selectedElement as? UMLElement)?.verticallySortedChildren else {
-            log.warning("Could not find elements in the model")
-            return
-        }
-        var newBounds: Boundary?
-        
-        
-        if children.isEmpty {
-            if let lastBounds = self.selectedElement?.bounds {
-                newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: 40)
-            }
-        }
-        
-        let containsAttributes: Bool = children.contains(where: { $0.type == .classAttribute })
-        let containsMethods: Bool = children.contains(where: { $0.type == .classMethod })
-        
-        if type == .classAttribute && !children.isEmpty {
-            if !containsAttributes && containsMethods {
-                if let lastBounds = children.first(where: { $0.type == .classMethod })?.bounds {
-                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y, width: lastBounds.width, height: lastBounds.height)
-                }
-            } else {
-                if let lastBounds = children.last(where: { $0.type == .classAttribute })?.bounds {
-                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: lastBounds.height)
-                }
-            }
-        }
-        
-        if type == .classMethod && !children.isEmpty {
-            if !containsMethods && containsAttributes {
-                if let lastBounds = children.last(where: { $0.type == .classAttribute })?.bounds {
-                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: lastBounds.height)
-                }
-            } else {
-                if let lastBounds = children.last(where: { $0.type == .classMethod })?.bounds {
-                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: lastBounds.height)
-                }
-            }
-        }
-        
-        let newChild = UMLElement(id: UUID().uuidString, name: name, type: type, owner: self.selectedElement?.id, bounds: newBounds, assessmentNote: nil)
-        let newItemHeight = (self.selectedElement?.bounds?.height ?? 0) + (newChild.bounds?.height ?? 0)
-        selectedElement?.bounds?.height = newItemHeight
-        (self.selectedElement as? UMLElement)?.addChild(newChild)
-        umlModel?.elements?.append(newChild)
-        
-        if type == .classAttribute && containsMethods {
-            if let firstMethodIndex = children.firstIndex(where: { $0.type == .classMethod }) {
-                for (index, child) in children.enumerated() where index >= firstMethodIndex {
-                    for (indexElement, childElement) in elements.enumerated() where child.id == childElement.id {
-                        let newYForElement = (umlModel?.elements?[indexElement].bounds?.y ?? 0) + (newBounds?.height ?? 0)
-                        umlModel?.elements?[indexElement].bounds?.y = newYForElement
-                    }
                 }
             }
         }

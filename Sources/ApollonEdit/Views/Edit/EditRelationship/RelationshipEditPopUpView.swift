@@ -129,6 +129,9 @@ struct RelationshipEditPopUpView: View {
                                                  targetElement: targetElement,
                                                  targetMultiplicity: targetMultiplicity,
                                                  targetRole: targetRole)
+            } else if (viewModel.diagramType == .objectDiagram) {
+                ObjectDiagramRelationshipEditView(viewModel: viewModel,
+                                                   isShowingPopup: $isShowingPopup)
             } else if (viewModel.diagramType == .useCaseDiagram) {
                 UseCaseDiagramRelationshipEditView(viewModel: viewModel,
                                                    isShowingPopup: $isShowingPopup,

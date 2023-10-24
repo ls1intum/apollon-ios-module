@@ -73,7 +73,7 @@ public enum UMLDiagramType: String, Codable {
     /// Returns true, if the diagram type has no supported renderer yet.
     public static func isDiagramTypeUnsupported(diagramType: UMLDiagramType) -> Bool {
         switch diagramType {
-        case .classDiagram, .useCaseDiagram:
+        case .classDiagram, .objectDiagram, .useCaseDiagram:
             return false
         default:
             return true

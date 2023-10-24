@@ -7,7 +7,7 @@ struct UMLRendererView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .topLeading) {
+            ZStack {
                 if viewModel.isGridBackground {
                     GridBackgroundView(gridBackgroundViewModel: gridBackgroundViewModel)
                 }

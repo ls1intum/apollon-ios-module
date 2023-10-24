@@ -29,6 +29,8 @@ struct ElementEditPopUpView: View {
         ScrollView(showsIndicators: false) {
             if(viewModel.diagramType == .classDiagram) {
                 ClassDiagramElementEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: elementName, elementType: elementType)
+            } else if (viewModel.diagramType == .objectDiagram) {
+                ObjectDiagramElementEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: elementName, elementType: elementType)
             } else if (viewModel.diagramType == .useCaseDiagram) {
                 UseCaseDiagramElementEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: elementName)
             } else {

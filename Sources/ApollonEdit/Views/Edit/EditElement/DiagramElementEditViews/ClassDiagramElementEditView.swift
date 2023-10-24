@@ -1,5 +1,6 @@
 import SwiftUI
 import ApollonShared
+import ApollonRenderer
 
 struct ClassDiagramElementEditView: View {
     @StateObject var viewModel: ApollonEditViewModel
@@ -141,7 +142,7 @@ struct ClassDiagramElementEditView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled(true)
                         .onSubmit {
-                            viewModel.addAttributeOrMethod(name: attributeInput, type: .classAttribute)
+                            addAttributeOrMethod(name: attributeInput, type: .classAttribute)
                             attributeInput = ""
                         }
                 }.padding([.leading, .trailing], 15)
@@ -183,7 +184,7 @@ struct ClassDiagramElementEditView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled(true)
                         .onSubmit {
-                            viewModel.addAttributeOrMethod(name: methodInput, type: .classMethod)
+                            addAttributeOrMethod(name: methodInput, type: .classMethod)
                             methodInput = ""
                         }
                 }.padding([.leading, .trailing], 15)
@@ -191,7 +192,7 @@ struct ClassDiagramElementEditView: View {
         }
     }
     
-    func bindingForElement(_ element: UMLElement) -> Binding<String> {
+    private func bindingForElement(_ element: UMLElement) -> Binding<String> {
         Binding(
             get: { element.name ?? "" },
             set: { newName in
@@ -200,5 +201,63 @@ struct ClassDiagramElementEditView: View {
                 }
             }
         )
+    }
+    
+    private func addAttributeOrMethod(name: String, type: UMLElementType) {
+        guard let elements = viewModel.umlModel?.elements, let children = (viewModel.selectedElement as? UMLElement)?.verticallySortedChildren else {
+            log.warning("Could not find elements in the model")
+            return
+        }
+        var newBounds: Boundary?
+        
+        if children.isEmpty {
+            if let lastBounds = viewModel.selectedElement?.bounds {
+                newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: 40)
+            }
+        }
+        
+        let containsAttributes: Bool = children.contains(where: { $0.type == .classAttribute })
+        let containsMethods: Bool = children.contains(where: { $0.type == .classMethod })
+        
+        if type == .classAttribute && !children.isEmpty {
+            if !containsAttributes && containsMethods {
+                if let lastBounds = children.first(where: { $0.type == .classMethod })?.bounds {
+                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y, width: lastBounds.width, height: lastBounds.height)
+                }
+            } else {
+                if let lastBounds = children.last(where: { $0.type == .classAttribute })?.bounds {
+                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: lastBounds.height)
+                }
+            }
+        }
+        
+        if type == .classMethod && !children.isEmpty {
+            if !containsMethods && containsAttributes {
+                if let lastBounds = children.last(where: { $0.type == .classAttribute })?.bounds {
+                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: lastBounds.height)
+                }
+            } else {
+                if let lastBounds = children.last(where: { $0.type == .classMethod })?.bounds {
+                    newBounds = Boundary(x: lastBounds.x, y: lastBounds.y + lastBounds.height, width: lastBounds.width, height: lastBounds.height)
+                }
+            }
+        }
+        
+        let newChild = UMLElement(name: name, type: type, owner: viewModel.selectedElement?.id, bounds: newBounds)
+        let newItemHeight = (viewModel.selectedElement?.bounds?.height ?? 0) + (newChild.bounds?.height ?? 0)
+        viewModel.selectedElement?.bounds?.height = newItemHeight
+        (viewModel.selectedElement as? UMLElement)?.addChild(newChild)
+        viewModel.umlModel?.elements?.append(newChild)
+        
+        if type == .classAttribute && containsMethods {
+            if let firstMethodIndex = children.firstIndex(where: { $0.type == .classMethod }) {
+                for (index, child) in children.enumerated() where index >= firstMethodIndex {
+                    for (indexElement, childElement) in elements.enumerated() where child.id == childElement.id {
+                        let newYForElement = (viewModel.umlModel?.elements?[indexElement].bounds?.y ?? 0) + (newBounds?.height ?? 0)
+                        viewModel.umlModel?.elements?[indexElement].bounds?.y = newYForElement
+                    }
+                }
+            }
+        }
     }
 }

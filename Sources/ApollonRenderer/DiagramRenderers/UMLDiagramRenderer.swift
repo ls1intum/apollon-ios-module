@@ -15,6 +15,8 @@ enum UMLDiagramRendererFactory {
         switch type {
         case .classDiagram:
             return UMLClassDiagramRenderer(context: context, canvasBounds: canvasBounds, fontSize: fontSize)
+        case .objectDiagram:
+            return UMLObjectDiagramRenderer(context: context, canvasBounds: canvasBounds, fontSize: fontSize)
         case .useCaseDiagram:
             return UMLUseCaseDiagramRenderer(context: context, canvasBounds: canvasBounds, fontSize: fontSize)
         default:
