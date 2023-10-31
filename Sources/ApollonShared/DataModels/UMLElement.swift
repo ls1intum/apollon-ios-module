@@ -8,16 +8,18 @@ public class UMLElement: Codable, SelectableUMLItem {
     public var type: UMLElementType?
     public var owner: String?
     public var bounds: Boundary?
+    public var direction: ElementDirection?
     public var assessmentNote: String?
     public var children: [UMLElement]? = [] // not decoded
     
     /// Public Init, so that new UML elements can be created
-    public init(id: String? = nil, name: String? = nil, type: UMLElementType? = nil, owner: String? = nil, bounds: Boundary? = nil, assessmentNote: String? = nil) {
+    public init(id: String? = nil, name: String? = nil, type: UMLElementType? = nil, owner: String? = nil, bounds: Boundary? = nil, direction: ElementDirection? = nil, assessmentNote: String? = nil) {
         self.id = id ?? UUID().uuidString
         self.name = name ?? type?.rawValue
         self.type = type
         self.owner = owner
         self.bounds = bounds
+        self.direction = direction
         self.assessmentNote = assessmentNote
     }
     

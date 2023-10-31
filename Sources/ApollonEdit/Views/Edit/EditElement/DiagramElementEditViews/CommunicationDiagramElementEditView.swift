@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 import ApollonRenderer
 
-struct ObjectDiagramElementEditView: View {
+struct CommunicationDiagramElementEditView: View {
     @StateObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     @Binding var elementName: String

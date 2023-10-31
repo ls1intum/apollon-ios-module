@@ -9,12 +9,8 @@ struct UseCaseDiagramElementEditView: View {
     var body: some View {
         ElementEditTopBar(viewModel: viewModel, isShowingPopup: $isShowingPopup)
         
-        Divider()
-            .frame(height: 1)
-            .overlay(Color.primary)
-            .padding([.leading, .trailing], 15)
-            .padding([.top, .bottom], 10)
+        EditDivider()
         
-        SimpleElementEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: $elementName)
+        ElementNameEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: $elementName)
     }
 }

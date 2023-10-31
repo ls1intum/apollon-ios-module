@@ -14,10 +14,10 @@ struct ElementAddView: View {
                         .aspectRatio(contentMode: .fit)
                 }
             }
-        }.frame(maxWidth: viewModel.geometrySize.width / 3, maxHeight: viewModel.geometrySize.height / 3)
+        }.frame(maxWidth: viewModel.geometrySize.width / 3.75, maxHeight: viewModel.geometrySize.height / 3)
         .background {
             RoundedRectangle(cornerRadius: 5)
                 .foregroundColor(.gray)
-        }.padding(5)
+        }.padding([.leading, .trailing], 10)
     }
 }

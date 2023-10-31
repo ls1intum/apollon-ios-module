@@ -26,7 +26,7 @@ public enum UMLDiagramType: String, Codable {
         case .useCaseDiagram:
             return [.useCaseActor, .useCase, .useCaseSystem]
         case .communicationDiagram:
-            return [.communicationLinkMessage]
+            return [.objectName]
         case .componentDiagram:
             return [.componentInterface, .component]
         case .deploymentDiagram:
@@ -73,7 +73,7 @@ public enum UMLDiagramType: String, Codable {
     /// Returns true, if the diagram type has no supported renderer yet.
     public static func isDiagramTypeUnsupported(diagramType: UMLDiagramType) -> Bool {
         switch diagramType {
-        case .classDiagram, .objectDiagram, .useCaseDiagram:
+        case .classDiagram, .objectDiagram, .useCaseDiagram, .communicationDiagram:
             return false
         default:
             return true

@@ -56,13 +56,9 @@ struct UseCaseDiagramRelationshipEditView: View {
                 )
         }.padding([.leading, .top, .trailing], 15)
         
-        Divider()
-            .frame(height: 1)
-            .overlay(Color.primary)
-            .padding([.leading, .trailing], 15)
-            .padding([.top, .bottom], 10)
+        EditDivider()
         
-        HStack(alignment: .center) {
+        HStack {
             Menu {
                 ForEach(UMLDiagramType.useCaseDiagram.diagramRelationshipTypes, id: \.self) { relationship in
                     Button(relationship.rawValue.replacingOccurrences(of: "UseCase", with: "")) {
@@ -82,7 +78,7 @@ struct UseCaseDiagramRelationshipEditView: View {
                 .padding(10)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(.blue, lineWidth: 2)
+                        .stroke(.blue, lineWidth: 1)
                 )
         }.padding([.leading, .trailing], 15)
             .onAppear {
@@ -90,16 +86,10 @@ struct UseCaseDiagramRelationshipEditView: View {
             }
         
         if type == .useCaseAssociation {
-            Divider()
-                .frame(height: 1)
-                .overlay(Color.primary)
-                .padding([.leading, .trailing], 15)
-                .padding([.top, .bottom], 10)
+            EditDivider()
             
             TextField("...", text: $relationshipName)
                 .textFieldStyle(PopUpTextFieldStyle())
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled(true)
                 .padding([.leading, .trailing], 15)
         }
     }

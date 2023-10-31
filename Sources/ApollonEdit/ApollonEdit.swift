@@ -9,50 +9,35 @@ public struct ApollonEdit: View {
     var fontSize: CGFloat
     var diagramOffset: CGPoint
     var isGridBackground: Bool
-    var problemStatementView: AnyView
     
-    public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool, problemStatementView: AnyView) {
+    public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
         self.umlModel = umlModel
         self.diagramType = diagramType
         self.fontSize = fontSize
         self.diagramOffset = diagramOffset
         self.isGridBackground = isGridBackground
-        self.problemStatementView = problemStatementView
     }
     
     public var body: some View {
         GeometryReader { geometry in
             NavigationStack {
-                ZStack {
+                ZStack(alignment: .topTrailing) {
                     UMLRendererEdit(viewModel: viewModel)
-                    VStack {
+                    VStack(alignment: .trailing) {
                         HStack {
+                            ResetZoomAndPositionButton(viewModel: viewModel)
                             Spacer()
-                            if isShowingAddElementMenu {
-                                ElementAddView(viewModel: viewModel)
-                            }
-                        }
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            MagnificationToolbar(viewModel: viewModel)
+                            AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
+                        }.padding([.leading, .top, .trailing], 10)
+                        if isShowingAddElementMenu {
+                            ElementAddView(viewModel: viewModel)
                         }
                     }
                 }.onAppear() {
-                    viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground, problemStatementView: problemStatementView)
+                    viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)
                     viewModel.setupScale(geometrySize: geometry.size)
                 }.onChange(of: fontSize) {
                     viewModel.fontSize = fontSize
-                }.toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        SubmitButton()
-                    }
-                    ToolbarItemGroup(placement: .topBarTrailing) {
-                        HStack(spacing: 1) {
-                            ProblemStatementButton(viewModel: viewModel)
-                            AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
-                        }
-                    }
                 }
             }
         }

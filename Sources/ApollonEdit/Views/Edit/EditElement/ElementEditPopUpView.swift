@@ -28,11 +28,22 @@ struct ElementEditPopUpView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             if(viewModel.diagramType == .classDiagram) {
-                ClassDiagramElementEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: elementName, elementType: elementType)
+                ClassDiagramElementEditView(viewModel: viewModel, 
+                                            isShowingPopup: $isShowingPopup,
+                                            elementName: elementName,
+                                            elementType: elementType)
             } else if (viewModel.diagramType == .objectDiagram) {
-                ObjectDiagramElementEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: elementName, elementType: elementType)
+                ObjectDiagramElementEditView(viewModel: viewModel,
+                                             isShowingPopup: $isShowingPopup,
+                                             elementName: elementName)
             } else if (viewModel.diagramType == .useCaseDiagram) {
-                UseCaseDiagramElementEditView(viewModel: viewModel, isShowingPopup: $isShowingPopup, elementName: elementName)
+                UseCaseDiagramElementEditView(viewModel: viewModel,
+                                              isShowingPopup: $isShowingPopup,
+                                              elementName: elementName)
+            } else if (viewModel.diagramType == .communicationDiagram) {
+                CommunicationDiagramElementEditView(viewModel: viewModel,
+                                                    isShowingPopup: $isShowingPopup,
+                                                    elementName: elementName)
             } else {
                 EmptyView()
             }

@@ -49,28 +49,6 @@ struct RelationshipEditPopUpView: View {
         )
     }
     
-    var sourceMultiplicity: Binding<String> {
-        Binding(
-            get: { (viewModel.selectedElement as? UMLRelationship)?.source?.multiplicity ?? "" },
-            set: { newMultiplicity in
-                if let relationship = viewModel.selectedElement as? UMLRelationship {
-                    relationship.source?.multiplicity = newMultiplicity
-                }
-            }
-        )
-    }
-    
-    var sourceRole: Binding<String> {
-        Binding(
-            get: { (viewModel.selectedElement as? UMLRelationship)?.source?.role ?? "" },
-            set: { newRole in
-                if let relationship = viewModel.selectedElement as? UMLRelationship {
-                    relationship.source?.role = newRole
-                }
-            }
-        )
-    }
-    
     var targetDirection: Binding<Direction> {
         Binding(
             get: { (viewModel.selectedElement as? UMLRelationship)?.target?.direction ?? .down },
@@ -93,28 +71,6 @@ struct RelationshipEditPopUpView: View {
         )
     }
     
-    var targetMultiplicity: Binding<String> {
-        Binding(
-            get: { (viewModel.selectedElement as? UMLRelationship)?.target?.multiplicity ?? "" },
-            set: { newMultiplicity in
-                if let relationship = viewModel.selectedElement as? UMLRelationship {
-                    relationship.target?.multiplicity = newMultiplicity
-                }
-            }
-        )
-    }
-    
-    var targetRole: Binding<String> {
-        Binding(
-            get: { (viewModel.selectedElement as? UMLRelationship)?.target?.role ?? "" },
-            set: { newRole in
-                if let relationship = viewModel.selectedElement as? UMLRelationship {
-                    relationship.target?.role = newRole
-                }
-            }
-        )
-    }
-    
     var body: some View {
         ScrollView(showsIndicators: false) {
             if(viewModel.diagramType == .classDiagram) {
@@ -123,15 +79,11 @@ struct RelationshipEditPopUpView: View {
                                                  relationshipType: relationshipType,
                                                  sourceDirection: sourceDirection,
                                                  sourceElement: sourceElement,
-                                                 sourceMultiplicity: sourceMultiplicity,
-                                                 sourceRole: sourceRole,
                                                  targetDirection: targetDirection,
-                                                 targetElement: targetElement,
-                                                 targetMultiplicity: targetMultiplicity,
-                                                 targetRole: targetRole)
+                                                 targetElement: targetElement)
             } else if (viewModel.diagramType == .objectDiagram) {
                 ObjectDiagramRelationshipEditView(viewModel: viewModel,
-                                                   isShowingPopup: $isShowingPopup)
+                                                  isShowingPopup: $isShowingPopup)
             } else if (viewModel.diagramType == .useCaseDiagram) {
                 UseCaseDiagramRelationshipEditView(viewModel: viewModel,
                                                    isShowingPopup: $isShowingPopup,
@@ -141,6 +93,11 @@ struct RelationshipEditPopUpView: View {
                                                    sourceElement: sourceElement,
                                                    targetDirection: targetDirection,
                                                    targetElement: targetElement)
+            } else if (viewModel.diagramType == .communicationDiagram) {
+                CommunicationDiagramRelationshipEditView(viewModel: viewModel,
+                                                         isShowingPopup: $isShowingPopup,
+                                                         sourceElement: sourceElement,
+                                                         targetElement: targetElement)
             } else {
                 EmptyView()
             }

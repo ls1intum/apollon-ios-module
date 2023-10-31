@@ -7,14 +7,54 @@ struct ClassDiagramRelationshipEditView: View {
     @Binding var relationshipType: UMLRelationshipType
     @Binding var sourceDirection: Direction
     @Binding var sourceElement: String
-    @Binding var sourceMultiplicity: String
-    @Binding var sourceRole: String
     @Binding var targetDirection: Direction
     @Binding var targetElement: String
-    @Binding var targetMultiplicity: String
-    @Binding var targetRole: String
     
     @State var type: UMLRelationshipType = .classBidirectional
+    
+    var sourceMultiplicity: Binding<String> {
+        Binding(
+            get: { (viewModel.selectedElement as? UMLRelationship)?.source?.multiplicity ?? "" },
+            set: { newMultiplicity in
+                if let relationship = viewModel.selectedElement as? UMLRelationship {
+                    relationship.source?.multiplicity = newMultiplicity
+                }
+            }
+        )
+    }
+    
+    var sourceRole: Binding<String> {
+        Binding(
+            get: { (viewModel.selectedElement as? UMLRelationship)?.source?.role ?? "" },
+            set: { newRole in
+                if let relationship = viewModel.selectedElement as? UMLRelationship {
+                    relationship.source?.role = newRole
+                }
+            }
+        )
+    }
+    
+    var targetMultiplicity: Binding<String> {
+        Binding(
+            get: { (viewModel.selectedElement as? UMLRelationship)?.target?.multiplicity ?? "" },
+            set: { newMultiplicity in
+                if let relationship = viewModel.selectedElement as? UMLRelationship {
+                    relationship.target?.multiplicity = newMultiplicity
+                }
+            }
+        )
+    }
+    
+    var targetRole: Binding<String> {
+        Binding(
+            get: { (viewModel.selectedElement as? UMLRelationship)?.target?.role ?? "" },
+            set: { newRole in
+                if let relationship = viewModel.selectedElement as? UMLRelationship {
+                    relationship.target?.role = newRole
+                }
+            }
+        )
+    }
     
     var body: some View {
         HStack {
@@ -57,13 +97,10 @@ struct ClassDiagramRelationshipEditView: View {
                 )
         }.padding([.leading, .top, .trailing], 15)
         
-        Divider()
-            .frame(height: 1)
-            .overlay(Color.primary)
-            .padding([.leading, .trailing], 15)
-            .padding([.top, .bottom], 10)
+        EditDivider()
         
-        HStack(alignment: .center) {
+        // RelationshipType picker
+        HStack {
             Menu {
                 ForEach(UMLDiagramType.classDiagram.diagramRelationshipTypes, id: \.self) { relationship in
                     Button(relationship.rawValue.replacingOccurrences(of: "Class", with: "")) {
@@ -83,76 +120,53 @@ struct ClassDiagramRelationshipEditView: View {
                 .padding(10)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(.blue, lineWidth: 2)
+                        .stroke(.blue, lineWidth: 1)
                 )
         }.padding([.leading, .trailing], 15)
             .onAppear {
                 type = relationshipType
             }
         
-        Divider()
-            .frame(height: 1)
-            .overlay(Color.primary)
+        EditDivider()
+        
+        // Source Multiplicity and Role Edit
+        MultiplicityOrRoleEditView(elementName: viewModel.getElementTypeById(elementId: sourceElement)?.rawValue ?? "",
+                                   multiplicityText: sourceMultiplicity,
+                                   roleText: sourceRole)
+        
+        EditDivider()
+        
+        // Target Multiplicity and Role edit
+        MultiplicityOrRoleEditView(elementName: viewModel.getElementTypeById(elementId: targetElement)?.rawValue ?? "",
+                                   multiplicityText: targetMultiplicity,
+                                   roleText: targetRole)
+    }
+}
+
+struct MultiplicityOrRoleEditView: View {
+    @State var elementName: String
+    @Binding var multiplicityText: String
+    @Binding var roleText: String
+    
+    var body: some View {
+        Text(elementName)
+            .font(.title2)
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding([.leading, .trailing], 15)
-            .padding([.top, .bottom], 10)
         
-        Group {
-            Text(viewModel.getElementTypeById(elementId: sourceElement)?.rawValue ?? "")
+        HStack {
+            Text("Multiplicity")
                 .font(.title2)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding([.leading, .trailing], 15)
-            
-            HStack {
-                Text("Multiplicity")
-                    .font(.title2)
-                TextField("", text: $sourceMultiplicity)
-                    .textFieldStyle(PopUpTextFieldStyle())
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
-            }.padding([.leading, .trailing], 15)
-            
-            HStack {
-                Text("Role")
-                    .font(.title2)
-                TextField("", text: $sourceRole)
-                    .textFieldStyle(PopUpTextFieldStyle())
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
-                
-            }.padding([.leading, .trailing], 15)
-        }
+            TextField("", text: $multiplicityText)
+                .textFieldStyle(PopUpTextFieldStyle())
+        }.padding([.leading, .trailing], 15)
         
-        Divider()
-            .frame(height: 1)
-            .overlay(Color.primary)
-            .padding([.leading, .trailing], 15)
-            .padding([.top, .bottom], 10)
-        
-        Group {
-            Text(viewModel.getElementTypeById(elementId: targetElement)?.rawValue ?? "")
+        HStack {
+            Text("Role")
                 .font(.title2)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding([.leading, .trailing], 15)
-            
-            HStack {
-                Text("Multiplicity")
-                    .font(.title2)
-                TextField("", text: $targetMultiplicity)
-                    .textFieldStyle(PopUpTextFieldStyle())
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
-            }.padding([.leading, .trailing], 15)
-            
-            HStack {
-                Text("Role")
-                    .font(.title2)
-                TextField("", text: $targetRole)
-                    .textFieldStyle(PopUpTextFieldStyle())
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
-            }.padding([.leading, .trailing], 15)
-        }
+            TextField("", text: $roleText)
+                .textFieldStyle(PopUpTextFieldStyle())
+        }.padding([.leading, .trailing], 15)
     }
 }

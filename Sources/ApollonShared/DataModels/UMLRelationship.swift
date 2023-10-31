@@ -13,6 +13,7 @@ public class UMLRelationship: Codable, SelectableUMLItem {
     public var source: UMLRelationshipEndPoint?
     public var target: UMLRelationshipEndPoint?
     public var isManuallyLayouted: Bool?
+    public var messages: [UMLElement]?
     
     /// Returns the relationship type as a String
     public var typeAsString: String? {
@@ -118,8 +119,38 @@ public struct PathPoint: Codable {
     public var x: Double
     public var y: Double
     
+    public init(x: Double, y: Double) {
+        self.x = x
+        self.y = y
+    }
+    
     public var asCGPoint: CGPoint {
         CGPoint(x: x, y: y)
+    }
+    
+    public func distanceToSquared(_ other: PathPoint) -> CGFloat {
+        return (self.x - other.x) * (self.x - other.x) + (self.y - other.y) * (self.y - other.y)
+    }
+    
+    public func subtract(_ other: PathPoint) -> PathPoint {
+        return PathPoint(x: self.x - other.x, y: self.y - other.y)
+    }
+    
+    public func add(_ other: PathPoint) -> PathPoint {
+        return PathPoint(x: self.x + other.x, y: self.y + other.y)
+    }
+    
+    public func length() -> CGFloat {
+        return sqrt(x * x + y * y)
+    }
+    
+    public func normalize() -> PathPoint {
+        let len = length()
+        return PathPoint(x: x / len, y: y / len)
+    }
+    
+    public func scale(_ factor: CGFloat) -> PathPoint {
+        return PathPoint(x: x * factor, y: y * factor)
     }
 }
 
@@ -132,50 +163,6 @@ public struct UMLRelationshipEndPoint: Codable {
     public var multiplicity: String?
     /// The role of the relationship
     public var role: String?
-}
-
-public enum Direction: String, Codable {
-    case left = "Left"
-    case right = "Right"
-    case up = "Up"
-    case down = "Down"
-    case upRight = "Upright"
-    case upLeft = "Upleft"
-    case downRight = "Downright"
-    case downLeft = "Downleft"
-    case topRight = "Topright"
-    case topLeft = "Topleft"
-    case bottomRight = "Bottomright"
-    case bottomLeft = "Bottomleft"
-    
-    public var inverted: Self {
-        switch self {
-        case .left:
-            return .right
-        case .right:
-            return .left
-        case .down:
-            return .up
-        case .up:
-            return .down
-        case .upRight:
-            return .upLeft
-        case .upLeft:
-            return .upRight
-        case .downRight:
-            return .downLeft
-        case .downLeft:
-            return .downRight
-        case .topRight:
-            return .bottomRight
-        case .topLeft:
-            return .bottomLeft
-        case .bottomRight:
-            return .topRight
-        case .bottomLeft:
-            return .topLeft
-        }
-    }
 }
 // swiftlint:enable identifier_name
 // swiftlint:enable discouraged_optional_boolean

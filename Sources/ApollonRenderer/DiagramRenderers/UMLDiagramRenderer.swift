@@ -19,6 +19,8 @@ enum UMLDiagramRendererFactory {
             return UMLObjectDiagramRenderer(context: context, canvasBounds: canvasBounds, fontSize: fontSize)
         case .useCaseDiagram:
             return UMLUseCaseDiagramRenderer(context: context, canvasBounds: canvasBounds, fontSize: fontSize)
+        case .communicationDiagram:
+            return UMLCommunicationDiagramRenderer(context: context, canvasBounds: canvasBounds, fontSize: fontSize)
         default:
             return nil
         }

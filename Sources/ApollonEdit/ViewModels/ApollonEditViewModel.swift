@@ -6,7 +6,6 @@ import ApollonShared
 open class ApollonEditViewModel: ApollonViewModel {
     @Published var selectedElement: SelectableUMLItem?
     @Published var selectedElementBounds: Boundary?
-    @Published var problemStatementView: AnyView?
     @Published var geometrySize = CGSize.zero
     @Published var currentDragLocation = CGPoint.zero
     @Published var scale: CGFloat = 1.0
@@ -15,17 +14,6 @@ open class ApollonEditViewModel: ApollonViewModel {
     @Published var minScale: CGFloat = 0.2
     @Published var maxScale: CGFloat = 3.0
     @Published var currentDiagramSize: CGSize = .zero
-    
-    @MainActor
-    public func setup(umlModel: UMLModel, diagramType: UMLDiagramType?, fontSize: CGFloat?, diagramOffset: CGPoint?, isGridBackground: Bool?, problemStatementView: AnyView?) {
-        super.umlModel = umlModel
-        super.diagramType = diagramType ?? umlModel.type
-        super.fontSize = fontSize ?? 14.0
-        super.diagramOffset = diagramOffset ?? CGPoint(x: 0, y: 0)
-        super.isGridBackground = isGridBackground ?? false
-        self.problemStatementView = problemStatementView ?? AnyView(EmptyView())
-        super.determineChildren()
-    }
     
     @MainActor
     var diagramSize: CGSize {
@@ -189,6 +177,13 @@ open class ApollonEditViewModel: ApollonViewModel {
             log.error("Attempted to create an unknown element")
         }
         determineChildren()
+    }
+    
+    func getElementById(elementId: String) -> UMLElement? {
+        if let element = umlModel?.elements?.first(where: { $0.id == elementId }) {
+            return element
+        }
+        return nil
     }
     
     func getElementTypeById(elementId: String) -> UMLElementType? {
