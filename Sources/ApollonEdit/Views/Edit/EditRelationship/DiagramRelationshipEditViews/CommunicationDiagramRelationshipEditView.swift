@@ -53,7 +53,7 @@ struct CommunicationDiagramRelationshipEditView: View {
             .padding([.leading, .trailing], 15)
         
         if let relationship = viewModel.selectedElement as? UMLRelationship {
-            EditOrAddLinkMessage(viewModel: viewModel, parentRelationship: relationship, messages: relationship.messages ?? [])
+            EditOrAddLinkMessage(viewModel: viewModel, parentRelationship: relationship, messages: relationship.messages ?? [:])
         }
     }
 }
@@ -63,44 +63,45 @@ struct CommunicationDiagramRelationshipEditView: View {
 struct EditOrAddLinkMessage: View {
     @StateObject var viewModel: ApollonEditViewModel
     @State var parentRelationship: UMLRelationship
-    @State var messages: [UMLElement]
+    @State var messages: [String : UMLElement]
     
     @State var input: String = ""
     
     var body: some View {
-        ForEach(messages, id: \.id) { message in
-            HStack {
-                TextField("Name", text: bindingForMessage(message))
-                    .textFieldStyle(PopUpTextFieldStyle())
-                
-                Button {
-                    changeMessageDirection(message: message)
-                } label: {
-                    Image(systemName: message.direction == .source ? "arrow.right" : "arrow.left")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .foregroundColor(Color.blue)
-                }.frame(width: 30, height: 30)
-                
-                Button {
-                    parentRelationship.messages?.removeAll { $0.id == message.id }
-                } label: {
-                    Image(systemName: "trash")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .foregroundColor(Color.blue)
-                }.frame(width: 30, height: 30)
-            }.padding([.leading, .trailing], 15)
-        }
-        
-        HStack {
-            TextField("", text: $input)
-                .textFieldStyle(DottedTextFieldStyle())
-                .onSubmit {
-                    addMessage(name: input)
-                    input = ""
-                }
-        }.padding([.leading, .trailing], 15)
+        Text("To fix")
+//        ForEach(messages, id: \.id) { message in
+//            HStack {
+//                TextField("Name", text: bindingForMessage(message))
+//                    .textFieldStyle(PopUpTextFieldStyle())
+//                
+//                Button {
+//                    changeMessageDirection(message: message)
+//                } label: {
+//                    Image(systemName: message.direction == .source ? "arrow.right" : "arrow.left")
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .foregroundColor(Color.blue)
+//                }.frame(width: 30, height: 30)
+//                
+//                Button {
+//                    parentRelationship.messages?.removeAll { $0.id == message.id }
+//                } label: {
+//                    Image(systemName: "trash")
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .foregroundColor(Color.blue)
+//                }.frame(width: 30, height: 30)
+//            }.padding([.leading, .trailing], 15)
+//        }
+//        
+//        HStack {
+//            TextField("", text: $input)
+//                .textFieldStyle(DottedTextFieldStyle())
+//                .onSubmit {
+//                    addMessage(name: input)
+//                    input = ""
+//                }
+//        }.padding([.leading, .trailing], 15)
     }
     
     // Creates a binding for the single child element (attribute or method)
@@ -108,9 +109,9 @@ struct EditOrAddLinkMessage: View {
         Binding(
             get: { message.name ?? "" },
             set: { newName in
-                if let relationshipIndex = viewModel.umlModel?.relationships?.firstIndex(where: { $0.id == parentRelationship.id }) {
-                    if let messageIndex = parentRelationship.messages?.firstIndex(where: { $0.id == message.id}) {
-                        viewModel.umlModel?.relationships?[relationshipIndex].messages?[messageIndex].name = newName
+                if let relationship = viewModel.umlModel?.relationships?.first(where: { $0.key == parentRelationship.id }) {
+                    if let foundMessage = parentRelationship.messages?.first(where: { $0.key == message.id}) {
+                        viewModel.umlModel?.relationships?[relationship.key]?.messages?[foundMessage.key]?.name = newName
                     }
                 }
             }

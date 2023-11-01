@@ -13,7 +13,7 @@ struct UMLObjectDiagramRelationshipRenderer: UMLDiagramRenderer {
         }
         
         for relationship in relationships {
-            draw(relationship: relationship)
+            draw(relationship: relationship.value)
         }
     }
     

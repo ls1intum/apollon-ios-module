@@ -13,7 +13,20 @@ struct UMLUseCaseDiagramElementRenderer: UMLDiagramRenderer {
         }
         
         for element in elements {
-            draw(element: element)
+            draw(element: element.value)
+        }
+        
+        // Hacky fix, to use 2 loops, as the elements dictionary is not sorted, so we need to render the children after the other elements, or they will be hidden.
+        for element in elements {
+            if element.value.type == .useCaseSystem {
+                draw(element: element.value)
+            }
+        }
+        
+        for element in elements {
+            if [UMLElementType.useCaseActor, .useCase].contains(element.value.type) {
+                draw(element: element.value)
+            }
         }
     }
     

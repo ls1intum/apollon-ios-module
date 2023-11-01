@@ -84,7 +84,7 @@ struct EditOrAddAttributeOrMethodView: View {
                     .textFieldStyle(PopUpTextFieldStyle())
                 Button {
                     (viewModel.selectedElement as? UMLElement)?.removeChild(child)
-                    viewModel.umlModel?.elements?.removeAll { $0.id ?? "" == child.id ?? ""}
+                    viewModel.umlModel?.elements?.removeValue(forKey: child.id ?? "")
                 } label: {
                     Image(systemName: "trash")
                         .resizable()
@@ -109,8 +109,8 @@ struct EditOrAddAttributeOrMethodView: View {
         Binding(
             get: { element.name ?? "" },
             set: { newName in
-                if let elementIndex = viewModel.umlModel?.elements?.firstIndex(where: { $0.id == element.id }) {
-                    viewModel.umlModel?.elements?[elementIndex].name = newName
+                if let element = viewModel.umlModel?.elements?.first(where: { $0.key == element.id }) {
+                    viewModel.umlModel?.elements?[element.key]?.name = newName
                 }
             }
         )
@@ -165,14 +165,14 @@ struct EditOrAddAttributeOrMethodView: View {
         let newItemHeight = (viewModel.selectedElement?.bounds?.height ?? 0) + (newChild.bounds?.height ?? 0)
         viewModel.selectedElement?.bounds?.height = newItemHeight
         (viewModel.selectedElement as? UMLElement)?.addChild(newChild)
-        viewModel.umlModel?.elements?.append(newChild)
+        viewModel.umlModel?.elements?[newChild.id ?? ""] = newChild
         
         if childTypeToAdd == attributeType && containsMethods {
             if let firstMethodIndex = children.firstIndex(where: { $0.type == methodType }) {
                 for (index, child) in children.enumerated() where index >= firstMethodIndex {
-                    for (indexElement, childElement) in elements.enumerated() where child.id == childElement.id {
-                        let newYForElement = (viewModel.umlModel?.elements?[indexElement].bounds?.y ?? 0) + (newBounds?.height ?? 0)
-                        viewModel.umlModel?.elements?[indexElement].bounds?.y = newYForElement
+                    for childElement in elements where child.id == childElement.key {
+                        let newYForElement = (viewModel.umlModel?.elements?[childElement.key]?.bounds?.y ?? 0) + (newBounds?.height ?? 0)
+                        viewModel.umlModel?.elements?[childElement.key]?.bounds?.y = newYForElement
                     }
                 }
             }

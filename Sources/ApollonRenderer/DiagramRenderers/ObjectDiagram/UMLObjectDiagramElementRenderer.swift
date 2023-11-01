@@ -13,58 +13,18 @@ struct UMLObjectDiagramElementRenderer: UMLDiagramRenderer {
         }
         
         for element in elements {
-            draw(element: element)
+            if element.value.type == .objectName {
+                drawTitle(of: element.value)
+            }
         }
     }
     
-    private func draw(element: UMLElement) {
-        guard let xCoordinate = element.bounds?.x,
-           let yCoordinate = element.bounds?.y,
-           let width = element.bounds?.width,
-           let height = element.bounds?.height else {
+    private func drawTitle(of element: UMLElement) {
+        guard let elementRect = element.boundsAsCGRect else {
             log.warning("Failed to draw a UML element: \(element)")
             return
         }
         
-        let elementRect = CGRect(x: xCoordinate, y: yCoordinate, width: width, height: height)
-        
-        switch element.type {
-        case .objectName, .objectAttribute, .objectMethod:
-            drawObjectElement(element: element, elementRect: elementRect)
-        default:
-            drawUnknownElement(element: element, elementRect: elementRect)
-        }
-    }
-    
-    private func drawObjectElement(element: UMLElement, elementRect: CGRect) {
-        switch element.type {
-        case .objectAttribute, .objectMethod:
-            drawAttributeOrMethod(element, in: elementRect)
-        default:
-            drawTitle(of: element, in: elementRect)
-        }
-    }
-    
-    private func drawUnknownElement(element: UMLElement, elementRect: CGRect) {
-        log.warning("Drawing logic for elements of type \(element.type?.rawValue ?? "nil") is not implemented")
-        context.stroke(Path(elementRect), with: .color(Color.secondary))
-    }
-    
-    private func drawAttributeOrMethod(_ element: UMLElement, in elementRect: CGRect) {
-        var text = Text(element.name ?? "")
-        text = text.font(.system(size: fontSize))
-
-        let elementTitle = context.resolve(text)
-        let titleSize = elementTitle.measure(in: elementRect.size)
-        let titleRect = CGRect(x: elementRect.minX + 5,
-                               y: elementRect.midY - titleSize.height / 2,
-                               width: titleSize.width,
-                               height: titleSize.height)
-        
-        context.draw(elementTitle, in: titleRect)
-    }
-    
-    private func drawTitle(of element: UMLElement, in elementRect: CGRect) {
         context.fill(Path(elementRect), with: .color(Color(UIColor.systemBackground)))
         context.stroke(Path(elementRect), with: .color(Color.primary))
         
@@ -80,11 +40,33 @@ struct UMLObjectDiagramElementRenderer: UMLDiagramRenderer {
         
         context.draw(elementTitle, in: titleRect)
         
-        if [UMLElementType.objectName].contains(element.type) {
-            drawAttributeAndMethodSeparators(element, in: elementRect)
+        if let children = element.verticallySortedChildren {
+            for child in children {
+                drawAttributeOrMethod(child)
+            }
         }
+        drawAttributeAndMethodSeparators(element, in: elementRect)
     }
-
+    
+    private func drawAttributeOrMethod(_ element: UMLElement) {
+        guard let elementRect = element.boundsAsCGRect else {
+            log.warning("Failed to draw a UML element: \(element)")
+            return
+        }
+        
+        var text = Text(element.name ?? "")
+        text = text.font(.system(size: fontSize))
+        
+        let elementTitle = context.resolve(text)
+        let titleSize = elementTitle.measure(in: elementRect.size)
+        let titleRect = CGRect(x: elementRect.minX + 5,
+                               y: elementRect.midY - titleSize.height / 2,
+                               width: titleSize.width,
+                               height: titleSize.height)
+        
+        context.draw(elementTitle, in: titleRect)
+    }
+    
     private func drawAttributeAndMethodSeparators(_ element: UMLElement, in elementRect: CGRect) {
         // Draw a line above the first attribute of this element
         if let firstAttribute = element.verticallySortedChildren?.first(where: { $0.type == .objectAttribute }),

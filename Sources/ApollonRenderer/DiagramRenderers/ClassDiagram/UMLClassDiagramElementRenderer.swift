@@ -12,8 +12,23 @@ struct UMLClassDiagramElementRenderer: UMLDiagramRenderer {
             return
         }
         
+        // Hacky fix, to use 2 loops, as the elements dictionary is not sorted, so we need to render the attributes and methods after the other elements, or they will be hidden.
         for element in elements {
-            draw(element: element)
+            if element.value.type == .package {
+                draw(element: element.value)
+            }
+        }
+        
+        for element in elements {
+            if [UMLElementType.Class, .abstractClass, .interface, .enumeration].contains(element.value.type) {
+                draw(element: element.value)
+            }
+        }
+        
+        for element in elements {
+            if [UMLElementType.classAttribute, .classMethod].contains(element.value.type) {
+                draw(element: element.value)
+            }
         }
     }
     

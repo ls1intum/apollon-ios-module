@@ -13,7 +13,7 @@ public class UMLRelationship: Codable, SelectableUMLItem {
     public var source: UMLRelationshipEndPoint?
     public var target: UMLRelationshipEndPoint?
     public var isManuallyLayouted: Bool?
-    public var messages: [UMLElement]?
+    public var messages: [String : UMLElement]?
     
     /// Returns the relationship type as a String
     public var typeAsString: String? {

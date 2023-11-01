@@ -31,7 +31,7 @@ open class ApollonViewModel: ObservableObject {
     @MainActor
     public func render(_ context: inout GraphicsContext, size: CGSize) {
         guard let model = self.umlModel,
-              let modelType = model.type,
+              let modelType = self.diagramType,
               !diagramTypeUnsupported else {
             return
         }
@@ -54,11 +54,12 @@ open class ApollonViewModel: ObservableObject {
             log.warning("Could not find elements in the model")
             return
         }
-        var potentialChildren = elements.filter({ $0.owner != nil })
         
-        for (elementIndex, element) in elements.enumerated().reversed() {
-            for (index, potentialChild) in potentialChildren.enumerated().reversed() where potentialChild.owner == element.id {
-                elements[elementIndex].addChild(potentialChild)
+        var potentialChildren = elements.values.filter({ $0.owner != nil })
+        
+        for element in elements.reversed() {
+            for (index, potentialChild) in potentialChildren.enumerated().reversed() where potentialChild.owner == element.key {
+                elements[element.key]?.addChild(potentialChild)
                 potentialChildren.remove(at: index)
             }
         }

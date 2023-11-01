@@ -53,7 +53,7 @@ open class ApollonEditViewModel: ApollonViewModel {
         var smallestYTopLeft: CGFloat = 0.0
         if let elements = umlModel?.elements {
             for element in elements {
-                if let bounds = element.bounds {
+                if let bounds = element.value.bounds {
                     if bounds.x + bounds.width > largestXBottomRight {
                         largestXBottomRight = bounds.x + bounds.width
                     }
@@ -73,8 +73,8 @@ open class ApollonEditViewModel: ApollonViewModel {
             
             if smallestXTopLeft < 0.0 || smallestYTopLeft < 0.0 {
                 for elementOrigin in elements {
-                    elementOrigin.bounds?.x += -(smallestXTopLeft)
-                    elementOrigin.bounds?.y += -(smallestYTopLeft)
+                    elementOrigin.value.bounds?.x += -(smallestXTopLeft)
+                    elementOrigin.value.bounds?.y += -(smallestYTopLeft)
                 }
                 currentDiagramSize.width += -(smallestXTopLeft)
                 currentDiagramSize.height += -(smallestYTopLeft)
@@ -84,21 +84,26 @@ open class ApollonEditViewModel: ApollonViewModel {
     
     @MainActor
     func selectItem(at point: CGPoint) {
-        selectedElement = getSelectableItem(at: point)
+        self.selectedElement = getSelectableItem(at: point)
+        self.selectedElementBounds = self.selectedElement?.bounds
     }
     
     @MainActor
     private func getSelectableItem(at point: CGPoint) -> SelectableUMLItem? {
         /// Check for UMLRelationship
-        if let relationship = umlModel?.relationships?.first(where: { $0.boundsContains(point: point) }) {
-            self.selectedElementBounds = relationship.bounds
-            return relationship
+        if let relationship = umlModel?.relationships?.first(where: { $0.value.boundsContains(point: point) }) {
+            return relationship.value
         }
         /// Check for UMLElement
         if let elements = umlModel?.elements {
-            for element in elements where element.boundsContains(point: point) {
-                self.selectedElementBounds = element.bounds
-                return element
+            for element in elements where element.value.boundsContains(point: point) {
+                if element.value.type?.isElementNotSelectable == true {
+                    if let ownerName = element.value.owner {
+                        return umlModel?.elements?[ownerName]
+                    }
+                } else {
+                    return element.value
+                }
             }
         }
         return nil
@@ -106,12 +111,24 @@ open class ApollonEditViewModel: ApollonViewModel {
     
     @MainActor
     func removeSelectedItem() {
-        umlModel?.elements?.removeAll { $0.owner ?? "" == self.selectedElement?.id ?? ""}
-        umlModel?.elements?.removeAll { $0.id ?? "" == self.selectedElement?.id ?? ""}
-        umlModel?.relationships?.removeAll {$0.source?.element ?? "" == self.selectedElement?.id ?? ""}
-        umlModel?.relationships?.removeAll {$0.target?.element ?? "" == self.selectedElement?.id ?? ""}
-        umlModel?.relationships?.removeAll {$0.id ?? "" == self.selectedElement?.id ?? ""}
-        self.selectedElement = nil
+        if let elements = umlModel?.elements {
+            for element in elements {
+                if element.value.owner == selectedElement?.id {
+                    umlModel?.elements?.removeValue(forKey: element.key)
+                }
+            }
+            
+        }
+        umlModel?.elements?.removeValue(forKey: selectedElement?.id ?? "")
+        if let relationships = umlModel?.relationships {
+            for relationship in relationships {
+                if relationship.value.source?.element == selectedElement?.id || relationship.value.target?.element == selectedElement?.id {
+                    umlModel?.relationships?.removeValue(forKey: relationship.key)
+                }
+            }
+        }
+        umlModel?.relationships?.removeValue(forKey: selectedElement?.id ?? "")
+        selectedElement = nil
     }
     
     @MainActor
@@ -143,11 +160,11 @@ open class ApollonEditViewModel: ApollonViewModel {
             
             if var offset = element.bounds?.height, let elements = umlModel?.elements, let children = element.verticallySortedChildren {
                 for child in children.reversed() {
-                    for (index, childElement) in elements.enumerated() where child.id == childElement.id {
-                        if let childBounds = childElement.bounds {
+                    for childElement in elements where child.id == childElement.key {
+                        if let childBounds = childElement.value.bounds {
                             offset -= childBounds.height
-                            umlModel?.elements?[index].bounds?.x = location.x
-                            umlModel?.elements?[index].bounds?.y = location.y + offset
+                            umlModel?.elements?[childElement.key]?.bounds?.x = location.x
+                            umlModel?.elements?[childElement.key]?.bounds?.y = location.y + offset
                         }
                     }
                 }
@@ -172,7 +189,12 @@ open class ApollonEditViewModel: ApollonViewModel {
         let middle = CGPoint(x: diagramSize.width / 2, y: diagramSize.height / 2)
         let elementCreator = ElementCreatorFactory.createElementCreator(for: type)
         if let elementCreator {
-            umlModel?.elements?.append(contentsOf: elementCreator.createAllElements(for: type, middle: middle))
+            let elementsToAdd = elementCreator.createAllElements(for: type, middle: middle)
+            for element in elementsToAdd {
+                if let elementId = element.id {
+                    umlModel?.elements?[elementId] = element
+                }
+            }
         } else {
             log.error("Attempted to create an unknown element")
         }
@@ -180,15 +202,15 @@ open class ApollonEditViewModel: ApollonViewModel {
     }
     
     func getElementById(elementId: String) -> UMLElement? {
-        if let element = umlModel?.elements?.first(where: { $0.id == elementId }) {
-            return element
+        if let element = umlModel?.elements?.first(where: { $0.key == elementId }) {
+            return element.value
         }
         return nil
     }
     
     func getElementTypeById(elementId: String) -> UMLElementType? {
-        if let element = umlModel?.elements?.first(where: { $0.id == elementId }) {
-            return element.type ?? nil
+        if let element = umlModel?.elements?.first(where: { $0.key == elementId }) {
+            return element.value.type ?? nil
         }
         return nil
     }

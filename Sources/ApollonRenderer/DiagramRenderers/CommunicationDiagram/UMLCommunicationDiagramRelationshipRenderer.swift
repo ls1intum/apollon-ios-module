@@ -13,7 +13,7 @@ struct UMLCommunicationDiagramRelationshipRenderer: UMLDiagramRenderer {
         }
         
         for relationship in relationships {
-            draw(relationship: relationship)
+            draw(relationship: relationship.value)
         }
     }
     
@@ -46,9 +46,9 @@ struct UMLCommunicationDiagramRelationshipRenderer: UMLDiagramRenderer {
         drawCommunicationLink(relationship, in: relationshipRect)
     }
     
-    private func drawMessages(_ relationship: UMLRelationship, messages: [UMLElement], in relationshipRect: CGRect) {
-        let sourceMessages = messages.filter({ $0.direction == .source })
-        let targetMessages = messages.filter({ $0.direction == .target })
+    private func drawMessages(_ relationship: UMLRelationship, messages: [String : UMLElement], in relationshipRect: CGRect) {
+        let sourceMessages = messages.values.filter({ $0.direction == .source })
+        let targetMessages = messages.values.filter({ $0.direction == .target })
         
         if !sourceMessages.isEmpty {
             for sourceMessage in sourceMessages {

@@ -5,8 +5,8 @@ public struct UMLModel: Codable {
     public var version: String?
     public var type: UMLDiagramType?
     public var size: Size?
-    public var elements: [UMLElement]?
-    public var relationships: [UMLRelationship]?
+    public var elements: [String : UMLElement]?
+    public var relationships: [String : UMLRelationship]?
 }
 
 /// The size of the UML model

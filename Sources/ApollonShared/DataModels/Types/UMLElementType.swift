@@ -56,4 +56,14 @@ public enum UMLElementType: String, Codable {
             return ""
         }
     }
+    
+    /// Returns true, if the element is not selectable by itself
+    public var isElementNotSelectable: Bool {
+        switch self {
+        case .classAttribute, .classMethod, .objectAttribute, .objectMethod, .communicationLinkMessage:
+            return true
+        default:
+            return false
+        }
+    }
 }
