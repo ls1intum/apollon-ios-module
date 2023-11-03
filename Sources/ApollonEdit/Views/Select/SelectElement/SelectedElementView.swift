@@ -52,6 +52,7 @@ struct SelectedElementView: View {
                                 .onEnded { value in
                                     viewModel.updateElementPosition(location: CGPoint(x: value.location.x + 25, y: value.location.y - (bounds.height + 25)))
                                     viewModel.adjustDiagramSizeForSelectedElement()
+                                    viewModel.updateRelationshipPosition()
                                     elementMoveStarted = false
                                     viewModel.selectedElement = nil
                                 }

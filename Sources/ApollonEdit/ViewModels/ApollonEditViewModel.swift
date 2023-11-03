@@ -136,28 +136,6 @@ open class ApollonEditViewModel: ApollonViewModel {
         if let element = selectedElement as? UMLElement {
             selectedElement?.bounds?.x = location.x
             selectedElement?.bounds?.y = location.y
-            
-            //            if let relationships = umlModel?.relationships {
-            //                for (index, relationship) in relationships.enumerated() {
-            //                    if var bounds = relationship.bounds {
-            //                        // SOURCE ELEMENT
-            //                        if relationship.source?.element == element.id {
-            //                            if var path = relationship.path {
-            //                            }
-            //                            // TARGET ELEMENT
-            //                        } else if relationship.target?.element == element.id {
-            //                            if var path = relationship.path {
-            //                            }
-            //                        }
-            //                        let newWidth = bounds.width + (bounds.x - location.x)
-            //                        let newHeight = bounds.height + (bounds.y - location.y)
-            //                        bounds.width = newWidth
-            //                        bounds.height = newHeight
-            //                        umlModel?.relationships?[index].bounds = bounds
-            //                    }
-            //                }
-            //            }
-            
             if var offset = element.bounds?.height, let elements = umlModel?.elements, let children = element.verticallySortedChildren {
                 for child in children.reversed() {
                     for childElement in elements where child.id == childElement.key {
@@ -170,6 +148,125 @@ open class ApollonEditViewModel: ApollonViewModel {
                 }
             }
         }
+    }
+    
+    @MainActor
+    func updateRelationshipPosition() {
+        guard let relationships = umlModel?.relationships else { return }
+        
+        for relationship in relationships {
+            if let source = relationship.value.source,
+               let target = relationship.value.target,
+               let sourceDirection = source.direction,
+               let targetDirection = target.direction,
+               let sourceElement = getElementById(elementId: source.element ?? ""),
+               let targetElement = getElementById(elementId: target.element ?? ""),
+               let sourceBounds = sourceElement.bounds,
+               let targetBounds = targetElement.bounds {
+                
+                // The points at which the relationship should start and end
+                let sourcePortPoint = getPortsForElement(direction: sourceDirection, elementBounds: sourceBounds).add(PathPoint(x: sourceBounds.x, y: sourceBounds.y))
+                let targetPortPoint = getPortsForElement(direction: targetDirection, elementBounds: targetBounds).add(PathPoint(x: targetBounds.x, y: targetBounds.y))
+                
+                // Calculates the new bounds of the relationship based on the previously calculated points
+                let newBounds = calculateBoundaryAroundPoints(point1: targetPortPoint, point2: sourcePortPoint)
+                relationship.value.bounds = newBounds
+                
+                var path: [PathPoint] = []
+                
+                // These are the starting and endpoints relative to the new bounding box
+                let startPoint = PathPoint(x: sourcePortPoint.x - newBounds.x, y: sourcePortPoint.y - newBounds.y)
+                let endPoint = PathPoint(x: targetPortPoint.x - newBounds.x, y: targetPortPoint.y - newBounds.y)
+                
+                // Use case diagrams use direct paths which can be diagonal, so no need to calculate the horizontal and vertical segments
+                if diagramType == .useCaseDiagram {
+                    path.append(startPoint)
+                    path.append(endPoint)
+                } else {
+                    //
+                    let startPointMargin = sourcePortPoint.add(getMarginPoint(direction: sourceDirection))
+                    let endPointMargin = targetPortPoint.add(getMarginPoint(direction: targetDirection))
+                    
+                    path.append(startPoint)
+                    path.append(startPoint.add(getMarginPoint(direction: sourceDirection)))
+                    
+                    // The variables help determine if the path segment should be horizontal or vertical
+                    let dx = abs(targetPortPoint.x - sourcePortPoint.x)
+                    let dy = abs(targetPortPoint.y - sourcePortPoint.y)
+                    
+                    // Calculates if a horizontal or vertical path needs to be added and appends it to the path
+                    // Positive stride step goes up and negative goes down
+                    if dx >= dy {
+                        // Horizontal path
+                        let step = (endPointMargin.x > startPointMargin.x) ? 1 : -1
+                        for x in stride(from: startPointMargin.x, to: endPointMargin.x, by: Double(step)) {
+                            let y = startPointMargin.y // Keep y constant
+                            path.append(PathPoint(x: x - newBounds.x, y: y - newBounds.y))
+                        }
+                    } else {
+                        // Vertical path
+                        let step = (endPointMargin.y > startPointMargin.y) ? 1 : -1
+                        for y in stride(from: startPointMargin.y, to: endPointMargin.y, by: Double(step)) {
+                            let x = startPointMargin.x // Keep x constant
+                            path.append(PathPoint(x: x - newBounds.x, y: y - newBounds.y))
+                        }
+                    }
+                    
+                    path.append(endPoint.add(getMarginPoint(direction: targetDirection)))
+                    path.append(endPoint)
+                }
+                relationship.value.path = path
+            }
+        }
+    }
+    
+    // Returns the point based on the direction of the relationship
+    private func getPortsForElement(direction: Direction, elementBounds: Boundary) -> PathPoint {
+        switch direction {
+        case .up:
+            return PathPoint(x: elementBounds.width / 2, y: 0)
+        case .right:
+            return PathPoint(x: elementBounds.width, y: elementBounds.height / 2)
+        case .down:
+            return PathPoint(x: elementBounds.width / 2, y: elementBounds.height)
+        case .left:
+            return PathPoint(x: 0, y: elementBounds.height / 2)
+        case .upRight:
+            return PathPoint(x: elementBounds.width, y: elementBounds.height / 4)
+        case .downRight:
+            return PathPoint(x: elementBounds.width, y: (3 * elementBounds.height) / 4)
+        case .upLeft:
+            return PathPoint(x: 0, y: elementBounds.height / 4)
+        case .downLeft:
+            return PathPoint(x: 0, y: (3 * elementBounds.height) / 4)
+        case .topRight:
+            return PathPoint(x: (3 * elementBounds.width) / 4, y: 0)
+        case .bottomRight:
+            return PathPoint(x: (3 * elementBounds.width) / 4, y: elementBounds.height)
+        case .topLeft:
+            return PathPoint(x: elementBounds.width / 4, y: 0)
+        case .bottomLeft:
+            return PathPoint(x: elementBounds.width / 4, y: elementBounds.height)
+        }
+    }
+    
+    // This returns the second point or second last point of the path which we call the margin point
+    private func getMarginPoint(direction: Direction) -> PathPoint {
+        let ENTITY_MARGIN = 40.0
+        switch direction {
+        case .up, .topRight, .topLeft:
+            return PathPoint(x: 0, y: -ENTITY_MARGIN)
+        case .right, .upRight, .downRight:
+            return PathPoint(x: ENTITY_MARGIN, y: 0)
+        case .down, .bottomRight, .bottomLeft:
+            return PathPoint(x: 0, y: ENTITY_MARGIN)
+        case .left, .upLeft, .downLeft:
+            return PathPoint(x: -ENTITY_MARGIN, y: 0)
+        }
+    }
+    
+    private func calculateBoundaryAroundPoints(point1: PathPoint, point2: PathPoint) -> Boundary {
+        return Boundary(x: min(point1.x, point2.x), y: min(point1.y, point2.y), width: abs(point2.x - point1.x), height: abs(point2.y - point1.y))
     }
     
     @MainActor

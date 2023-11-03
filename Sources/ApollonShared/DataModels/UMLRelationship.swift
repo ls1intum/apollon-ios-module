@@ -164,5 +164,7 @@ public struct UMLRelationshipEndPoint: Codable {
     /// The role of the relationship
     public var role: String?
 }
+
+
 // swiftlint:enable identifier_name
 // swiftlint:enable discouraged_optional_boolean

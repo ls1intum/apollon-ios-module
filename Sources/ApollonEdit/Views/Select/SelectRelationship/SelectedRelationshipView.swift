@@ -12,6 +12,11 @@ struct SelectedRelationshipView: View {
                 pathWithPoints
                     .stroke(Color.blue, lineWidth: 15)
                     .opacity(0.5)
+//                Rectangle()
+//                    .stroke(Color.blue, lineWidth: 1)
+//                    .opacity(0.5)
+//                    .frame(width: bounds.width, height: bounds.height)
+//                    .position(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2))
                 EditSelectedItemButton(viewModel: viewModel)
                     .position(calculateMidpoint(of: path, with: bounds))
             }
