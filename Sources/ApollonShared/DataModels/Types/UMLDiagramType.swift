@@ -42,11 +42,12 @@ public enum UMLDiagramType: String, Codable {
         }
     }
     
-    /// The different relationships of each diagram, that the user can create
+    /// The different relationships of each diagram, that the user can create.
+    /// The first element of the returned array is the initial relationship type that is used, when a new relationship is created!
     public var diagramRelationshipTypes: [UMLRelationshipType] {
         switch self {
         case .classDiagram:
-            return [.classAggregation, .classUnidirectional, .classBidirectional, .classComposition, .classDependency, .classInheritance, .classRealization]
+            return [.classBidirectional, .classUnidirectional, .classAggregation, .classComposition, .classDependency, .classInheritance, .classRealization]
         case .objectDiagram:
             return [.objectLink]
         case .activityDiagram:

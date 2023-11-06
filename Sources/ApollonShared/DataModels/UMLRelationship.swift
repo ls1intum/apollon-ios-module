@@ -15,6 +15,21 @@ public class UMLRelationship: Codable, SelectableUMLItem {
     public var isManuallyLayouted: Bool?
     public var messages: [String : UMLElement]?
     
+    /// Public Init, so that new UML relationships can be created
+    public init(id: String? = nil, name: String? = nil, type: UMLRelationshipType? = nil, owner: String? = nil, bounds: Boundary? = nil, assessmentNote: String? = nil, path: [PathPoint]? = nil, source: UMLRelationshipEndPoint? = nil, target: UMLRelationshipEndPoint? = nil, isManuallyLayouted: Bool? = nil, messages: [String : UMLElement]? = nil) {
+        self.id = id ?? UUID().uuidString
+        self.name = name
+        self.type = type
+        self.owner = owner
+        self.bounds = bounds
+        self.assessmentNote = assessmentNote
+        self.path = path
+        self.source = source
+        self.target = target
+        self.isManuallyLayouted = isManuallyLayouted
+        self.messages = messages
+    }
+    
     /// Returns the relationship type as a String
     public var typeAsString: String? {
         type?.rawValue
@@ -163,6 +178,13 @@ public struct UMLRelationshipEndPoint: Codable {
     public var multiplicity: String?
     /// The role of the relationship
     public var role: String?
+    
+    public init(direction: Direction? = nil, element: String? = nil, multiplicity: String? = nil, role: String? = nil) {
+        self.direction = direction ?? .up
+        self.element = element ?? ""
+        self.multiplicity = multiplicity
+        self.role = role
+    }
 }
 
 
