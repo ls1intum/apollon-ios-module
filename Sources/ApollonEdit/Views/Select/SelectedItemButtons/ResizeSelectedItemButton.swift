@@ -1,8 +1,10 @@
 import SwiftUI
+import ApollonShared
 
 struct ResizeSelectedItemButton: View {
     @StateObject var viewModel: ApollonEditViewModel
-    
+    var resizeBy: ResizeableDirection
+
     var body: some View {
         Image(systemName: "arrow.up.left.and.arrow.down.right")
             .frame(width: 35, height: 35)
@@ -10,7 +12,8 @@ struct ResizeSelectedItemButton: View {
             .padding(5)
             .background {
                 Circle()
-                    .foregroundColor(.blue)
+                    .foregroundColor(resizeBy == .none ? .gray : .blue)
             }
+            .disabled(resizeBy == .none)
     }
 }

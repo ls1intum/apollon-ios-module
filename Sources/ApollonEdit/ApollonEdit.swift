@@ -21,17 +21,21 @@ public struct ApollonEdit: View {
     public var body: some View {
         GeometryReader { geometry in
             NavigationStack {
-                ZStack(alignment: .topTrailing) {
+                ZStack(alignment: .topLeading) {
                     UMLRendererEdit(viewModel: viewModel)
-                    VStack(alignment: .trailing) {
-                        HStack {
-                            ResetZoomAndPositionButton(viewModel: viewModel)
-                            Spacer()
-                            AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
-                        }.padding([.leading, .top, .trailing], 10)
-                        if isShowingAddElementMenu {
-                            ElementAddView(viewModel: viewModel)
-                        }
+                    ResetZoomAndPositionButton(viewModel: viewModel)
+                    VStack {
+                        Spacer()
+                        AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
+                            .popover(isPresented: $isShowingAddElementMenu) {
+                                ZStack {
+                                    Color.blue
+                                        .scaleEffect(1.5)
+                                        .opacity(0.5)
+                                    ElementAddView(viewModel: viewModel)
+                                        .presentationCompactAdaptation(.none)
+                                }
+                            }
                     }
                 }.onAppear() {
                     viewModel.setup(umlModel: self.umlModel, diagramType: self.diagramType, fontSize: self.fontSize, diagramOffset: self.diagramOffset, isGridBackground: self.isGridBackground)

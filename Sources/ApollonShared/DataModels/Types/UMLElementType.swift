@@ -56,7 +56,7 @@ public enum UMLElementType: String, Codable {
             return ""
         }
     }
-    
+
     /// Returns true, if the element is not selectable by itself
     public var isElementNotSelectable: Bool {
         switch self {
@@ -66,4 +66,25 @@ public enum UMLElementType: String, Codable {
             return false
         }
     }
+
+    /// The direction to which the element is resizable
+    public var resizeBy: ResizeableDirection {
+        switch self {
+        case .package, .activityObjectNode, .activityMergeNode, .activityActionNode, .activity, .useCaseSystem, .useCase, .component:
+            return .widthAndHeight
+        case .enumeration, .interface, .abstractClass, .Class, .objectName, .activityForkNodeHorizontal:
+            return .width
+        case .activityForkNode:
+            return .height
+        default:
+            return .none
+        }
+    }
+}
+
+public enum ResizeableDirection {
+    case widthAndHeight
+    case width
+    case height
+    case none
 }

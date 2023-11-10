@@ -9,7 +9,7 @@ struct UMLRendererEdit: View {
     @State private var elementMoveStarted = false
     @State private var elementResizeStarted = false
     @State private var gridSize: CGSize = .zero
-    
+
     var body: some View {
         ZStack {
             if viewModel.isGridBackground {
@@ -57,7 +57,7 @@ struct UMLRendererEdit: View {
                 : nil
             )
     }
-    
+
     private func handleDrag(_ gesture: DragGesture.Value) {
         if dragStarted {
             dragStarted = false
@@ -66,10 +66,10 @@ struct UMLRendererEdit: View {
         viewModel.setDragLocation(at: CGPoint(x: startDragLocation.x + gesture.translation.width,
                                               y: startDragLocation.y + gesture.translation.height))
     }
-    
+
     private func handleMagnification(_ newScale: MagnificationGesture.Value) {
         viewModel.progressingScale = newScale
-        
+
         // Enforce zoom out limit
         if viewModel.progressingScale * viewModel.scale < viewModel.minScale {
             viewModel.progressingScale = viewModel.minScale / viewModel.scale
@@ -79,11 +79,11 @@ struct UMLRendererEdit: View {
             viewModel.progressingScale = viewModel.maxScale / viewModel.scale
         }
     }
-    
+
     private func handleMagnificationEnd(_ finalScale: MagnificationGesture.Value) {
         viewModel.scale *= finalScale
         viewModel.progressingScale = 1
-        
+
         // Enforce zoom out limit
         if viewModel.scale < viewModel.minScale {
             viewModel.scale = viewModel.minScale

@@ -68,16 +68,16 @@ open class ApollonEditViewModel: ApollonViewModel {
                     }
                 }
             }
-            currentDiagramSize.width = largestXBottomRight
-            currentDiagramSize.height = largestYBottomRight
+            currentDiagramSize.width = largestXBottomRight + 1
+            currentDiagramSize.height = largestYBottomRight + 1
             
             if smallestXTopLeft < 0.0 || smallestYTopLeft < 0.0 {
                 for elementOrigin in elements {
                     elementOrigin.value.bounds?.x += -(smallestXTopLeft)
                     elementOrigin.value.bounds?.y += -(smallestYTopLeft)
                 }
-                currentDiagramSize.width += -(smallestXTopLeft)
-                currentDiagramSize.height += -(smallestYTopLeft)
+                currentDiagramSize.width += -(smallestXTopLeft) + 1
+                currentDiagramSize.height += -(smallestYTopLeft) + 1
             }
         }
     }
@@ -273,9 +273,11 @@ open class ApollonEditViewModel: ApollonViewModel {
     func updateElementSize(drag: CGSize) {
         if let element = selectedElement as? UMLElement {
             selectedElement?.bounds?.width += drag.width
+            selectedElement?.bounds?.height += drag.height
             if let children = element.verticallySortedChildren {
                 for child in children {
                     child.bounds?.width += drag.width
+                    child.bounds?.height += drag.height
                 }
             }
         }
@@ -295,7 +297,6 @@ open class ApollonEditViewModel: ApollonViewModel {
         } else {
             log.error("Attempted to create an unknown element")
         }
-        determineChildren()
     }
     
     func getElementById(elementId: String) -> UMLElement? {

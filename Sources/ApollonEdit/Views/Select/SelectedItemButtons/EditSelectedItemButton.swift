@@ -20,6 +20,7 @@ struct EditSelectedItemButton: View {
         }.sheet(isPresented: $isShowingPopup, onDismiss: {
             isShowingPopup = false
             viewModel.selectedElement = nil
+            
         }) {
             if viewModel.selectedElement is UMLElement {
                 ElementEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)

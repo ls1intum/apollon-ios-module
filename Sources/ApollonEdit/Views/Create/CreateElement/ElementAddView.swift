@@ -4,7 +4,7 @@ struct ElementAddView: View {
     @StateObject var viewModel: ApollonEditViewModel
     
     var body: some View {
-        VStack(spacing: 0) {
+        HStack {
             ForEach(viewModel.diagramType?.diagramElementTypes ?? [], id: \.self) { type in
                 Button {
                     viewModel.addElement(type: type)
@@ -13,11 +13,7 @@ struct ElementAddView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 }
-            }
-        }.frame(maxWidth: viewModel.geometrySize.width / 3.75, maxHeight: viewModel.geometrySize.height / 3)
-        .background {
-            RoundedRectangle(cornerRadius: 5)
-                .foregroundColor(.gray)
-        }.padding([.leading, .trailing], 10)
+            }.padding(3)
+        }.frame(maxHeight: viewModel.geometrySize.height / 15)
     }
 }

@@ -6,16 +6,13 @@ struct AddElementButton: View {
     
     var body: some View {
         Button {
-            isAddElementMenuVisible.toggle()
+            isAddElementMenuVisible = true
         } label: {
-            Image(systemName: "square.badge.plus")
-                .frame(width: 25, height: 25)
-                .foregroundColor(.white)
-                .padding(5)
-                .background {
-                    RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(.blue)
-                }
-        }
+            Image(systemName: "plus.circle.fill")
+                .resizable()
+                .frame(width: 50, height: 50)
+                .foregroundColor(Color.blue)
+                .symbolRenderingMode(.hierarchical)
+        }.frame(maxWidth: .infinity, alignment: .center)
     }
 }

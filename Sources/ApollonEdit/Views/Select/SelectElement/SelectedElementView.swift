@@ -16,6 +16,8 @@ struct SelectedElementView: View {
     @State private var startPoint: CGPoint = .zero
     @State private var endPoint: CGPoint = .zero
     
+    @State var elementResizeBounds: CGSize = .zero
+    
     var body: some View {
         if let bounds = viewModel.selectedElementBounds {
             ZStack {
@@ -118,22 +120,23 @@ struct SelectedElementView: View {
                 
                 // The button for the resizing of the selected element
                 if !elementMoveStarted {
-                    ResizeSelectedItemButton(viewModel: viewModel)
-                        .position(CGPoint(x: bounds.x + (bounds.width + 25), y: bounds.y + (bounds.height + 25)))
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    elementResizeStarted = true
-                                    viewModel.selectedElementBounds?.width = (viewModel.selectedElement?.bounds?.width ?? 0) + value.translation.width
-                                }
-                                .onEnded { value in
-                                    viewModel.updateElementSize(drag: value.translation)
-                                    viewModel.adjustDiagramSizeForSelectedElement()
-                                    viewModel.updateRelationshipPosition()
-                                    elementResizeStarted = false
-                                    viewModel.selectedElement = nil
-                                }
-                        )
+                    if let resizeBy = (viewModel.selectedElement as? UMLElement)?.type?.resizeBy {
+                        ResizeSelectedItemButton(viewModel: viewModel, resizeBy: resizeBy)
+                            .position(CGPoint(x: bounds.x + (bounds.width + 25), y: bounds.y + (bounds.height + 25)))
+                            .gesture(
+                                DragGesture()
+                                    .onChanged { value in
+                                        handleElementResize(value, resizeBy: resizeBy)
+                                    }
+                                    .onEnded { value in
+                                        viewModel.updateElementSize(drag: elementResizeBounds)
+                                        viewModel.adjustDiagramSizeForSelectedElement()
+                                        viewModel.updateRelationshipPosition()
+                                        elementResizeStarted = false
+                                        viewModel.selectedElement = nil
+                                    }
+                            )
+                    }
                 }
                 
                 // The button for the editing of the selected element
@@ -165,6 +168,23 @@ struct SelectedElementView: View {
         endPoint = gesture.location
         isDrawingLine = false
         isShowingRelationshipConnectionPoints = false
+    }
+    
+    private func handleElementResize(_ gesture: DragGesture.Value, resizeBy: ResizeableDirection) {
+        elementResizeStarted = true
+        switch resizeBy {
+        case .widthAndHeight:
+            elementResizeBounds.width = gesture.translation.width
+            elementResizeBounds.height = gesture.translation.height
+        case .width:
+            elementResizeBounds.width = gesture.translation.width
+        case .height:
+            elementResizeBounds.height = gesture.translation.height
+        default:
+            return
+        }
+        viewModel.selectedElementBounds?.width = (viewModel.selectedElement?.bounds?.width ?? 0) + elementResizeBounds.width
+        viewModel.selectedElementBounds?.height = (viewModel.selectedElement?.bounds?.height ?? 0) + elementResizeBounds.height
     }
 }
 

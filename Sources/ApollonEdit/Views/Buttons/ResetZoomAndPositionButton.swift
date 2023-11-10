@@ -10,6 +10,7 @@ struct ResetZoomAndPositionButton: View {
             viewModel.progressingScale = 1.0
         } label: {
             Image(systemName: "scope")
+                .resizable()
                 .frame(width: 25, height: 25)
                 .foregroundColor(.white)
                 .padding(5)
@@ -17,6 +18,6 @@ struct ResetZoomAndPositionButton: View {
                     RoundedRectangle(cornerRadius: 5)
                         .foregroundColor(.blue)
                 }
-        }
+        }.padding([.leading, .top], 10)
     }
 }
