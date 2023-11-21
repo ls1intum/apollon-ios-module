@@ -16,8 +16,17 @@ open class ApollonEditViewModel: ApollonViewModel {
     @Published var currentDiagramSize: CGSize = .zero
     
     @MainActor
+    // FIX THIS...
     var diagramSize: CGSize {
-        umlModel?.size?.asCGSize ?? CGSize()
+        if let size = umlModel?.size?.asCGSize {
+            if size.width == 0 || size.height == 0 {
+                return CGSize(width: 750.0, height: 1000.0)
+            } else {
+                return size
+            }
+        } else {
+            return CGSize(width: 750.0, height: 1000.0)
+        }
     }
     
     @MainActor
@@ -32,7 +41,7 @@ open class ApollonEditViewModel: ApollonViewModel {
     @MainActor
     func setupScale(geometrySize: CGSize) {
         self.geometrySize = geometrySize
-        self.currentDiagramSize = umlModel?.size?.asCGSize ?? CGSize()
+        self.currentDiagramSize = self.diagramSize
         calculateIdealScale()
         scale = idealScale
     }

@@ -1,7 +1,7 @@
 import Foundation
 
 /// All the different UML Diagram Types
-public enum UMLDiagramType: String, Codable {
+public enum UMLDiagramType: String, Codable, CaseIterable {
     case classDiagram = "ClassDiagram"
     case objectDiagram = "ObjectDiagram"
     case activityDiagram = "ActivityDiagram"
