@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ResetZoomAndPositionButton: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     
     var body: some View {
         Button {

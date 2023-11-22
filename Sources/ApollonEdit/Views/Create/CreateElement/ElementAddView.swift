@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct ElementAddView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     
     var body: some View {
         HStack {
-            ForEach(viewModel.diagramType?.diagramElementTypes ?? [], id: \.self) { type in
+            ForEach(viewModel.diagramType.diagramElementTypes, id: \.self) { type in
                 Button {
                     viewModel.addElement(type: type)
                 } label: {

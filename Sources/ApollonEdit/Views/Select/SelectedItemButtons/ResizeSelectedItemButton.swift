@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct ResizeSelectedItemButton: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     var resizeBy: ResizeableDirection
 
     var body: some View {

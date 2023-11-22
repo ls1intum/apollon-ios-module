@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AddElementButton: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isAddElementMenuVisible: Bool
     
     var body: some View {

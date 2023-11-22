@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct ElementEditPopUpView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     
     var elementName: Binding<String> {

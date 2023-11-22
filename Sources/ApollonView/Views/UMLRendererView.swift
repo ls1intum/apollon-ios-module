@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct UMLRendererView: View {
-    @StateObject public var viewModel: ApollonViewViewModel
+    @ObservedObject var viewModel: ApollonViewViewModel
     @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
     
     var body: some View {

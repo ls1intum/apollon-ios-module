@@ -4,7 +4,7 @@ import ApollonRenderer
 
 // The top bar of the element edit pop up sheet
 struct ElementEditTopBar: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     
     var body: some View {
@@ -33,7 +33,7 @@ struct ElementEditTopBar: View {
 
 // The textfield, that allows for changing the element name
 struct ElementNameEditView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     @Binding var elementName: String
     
@@ -56,7 +56,7 @@ struct ElementNameEditView: View {
 
 // The View, that allows the user to edit or add attributes or methods to the selected element
 struct EditOrAddAttributeOrMethodView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     
     var title: String
     var childTypeToAdd: UMLElementType
@@ -84,7 +84,7 @@ struct EditOrAddAttributeOrMethodView: View {
                     .textFieldStyle(PopUpTextFieldStyle())
                 Button {
                     (viewModel.selectedElement as? UMLElement)?.removeChild(child)
-                    viewModel.umlModel?.elements?.removeValue(forKey: child.id ?? "")
+                    viewModel.umlModel.elements?.removeValue(forKey: child.id ?? "")
                 } label: {
                     Image(systemName: "trash")
                         .resizable()
@@ -109,8 +109,8 @@ struct EditOrAddAttributeOrMethodView: View {
         Binding(
             get: { element.name ?? "" },
             set: { newName in
-                if let element = viewModel.umlModel?.elements?.first(where: { $0.key == element.id }) {
-                    viewModel.umlModel?.elements?[element.key]?.name = newName
+                if let element = viewModel.umlModel.elements?.first(where: { $0.key == element.id }) {
+                    viewModel.umlModel.elements?[element.key]?.name = newName
                 }
             }
         )
@@ -118,7 +118,7 @@ struct EditOrAddAttributeOrMethodView: View {
     
     // This method adds an attribute or method for class and object diagrams to the selected element
     private func addAttributeOrMethod(name: String) {
-        guard let elements = viewModel.umlModel?.elements, let children = (viewModel.selectedElement as? UMLElement)?.verticallySortedChildren else {
+        guard let elements = viewModel.umlModel.elements, let children = (viewModel.selectedElement as? UMLElement)?.verticallySortedChildren else {
             log.warning("Could not find elements in the model")
             return
         }
@@ -165,14 +165,14 @@ struct EditOrAddAttributeOrMethodView: View {
         let newItemHeight = (viewModel.selectedElement?.bounds?.height ?? 0) + (newChild.bounds?.height ?? 0)
         viewModel.selectedElement?.bounds?.height = newItemHeight
         (viewModel.selectedElement as? UMLElement)?.addChild(newChild)
-        viewModel.umlModel?.elements?[newChild.id ?? ""] = newChild
+        viewModel.umlModel.elements?[newChild.id ?? ""] = newChild
         
         if childTypeToAdd == attributeType && containsMethods {
             if let firstMethodIndex = children.firstIndex(where: { $0.type == methodType }) {
                 for (index, child) in children.enumerated() where index >= firstMethodIndex {
                     for childElement in elements where child.id == childElement.key {
-                        let newYForElement = (viewModel.umlModel?.elements?[childElement.key]?.bounds?.y ?? 0) + (newBounds?.height ?? 0)
-                        viewModel.umlModel?.elements?[childElement.key]?.bounds?.y = newYForElement
+                        let newYForElement = (viewModel.umlModel.elements?[childElement.key]?.bounds?.y ?? 0) + (newBounds?.height ?? 0)
+                        viewModel.umlModel.elements?[childElement.key]?.bounds?.y = newYForElement
                     }
                 }
             }

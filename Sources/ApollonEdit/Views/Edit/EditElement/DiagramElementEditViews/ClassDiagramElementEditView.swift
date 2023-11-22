@@ -3,7 +3,7 @@ import ApollonShared
 import ApollonRenderer
 
 struct ClassDiagramElementEditView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     @Binding var elementName: String
     @Binding var elementType: UMLElementType

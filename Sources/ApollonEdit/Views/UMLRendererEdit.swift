@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct UMLRendererEdit: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
     @State private var startDragLocation = CGPoint.zero
     @State private var dragStarted = true
@@ -29,17 +29,17 @@ struct UMLRendererEdit: View {
                         SelectedRelationshipView(viewModel: viewModel)
                     }
                 }
-                //Rectangle().stroke(.blue, lineWidth: 1)
-            }.frame(width: max(viewModel.diagramSize.width, viewModel.currentDiagramSize.width),
-                    height: max(viewModel.diagramSize.height, viewModel.currentDiagramSize.height))
+                Rectangle().stroke(.blue, lineWidth: 1)
+            }.frame(width: max(viewModel.umlModel.size?.width ?? 1, viewModel.initialDiagramSize.width),
+                    height: max(viewModel.umlModel.size?.height ?? 1, viewModel.initialDiagramSize.height))
         }.scaleEffect(viewModel.scale * viewModel.progressingScale)
             .position(viewModel.currentDragLocation)
             .onAppear{
-                gridSize = CGSize(width: viewModel.geometrySize.width * 10, height: viewModel.geometrySize.height * 10)
+                gridSize = CGSize(width: viewModel.geometrySize.width * 8, height: viewModel.geometrySize.height * 8)
                 gridBackgroundViewModel.gridSize = gridSize
                 gridBackgroundViewModel.showGridBackgroundBorder = true
                 viewModel.setDragLocation()
-            }.onChange(of: viewModel.currentDiagramSize) {
+            }.onChange(of: viewModel.initialDiagramSize) {
                 viewModel.calculateIdealScale()
             }.gesture(
                 !elementMoveStarted && !elementResizeStarted ?

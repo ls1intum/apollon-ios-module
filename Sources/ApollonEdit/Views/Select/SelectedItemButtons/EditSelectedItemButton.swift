@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct EditSelectedItemButton: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @State private var isShowingPopup: Bool = false
     
     var body: some View {

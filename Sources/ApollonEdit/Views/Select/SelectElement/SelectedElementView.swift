@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct SelectedElementView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var elementMoveStarted: Bool
     @Binding var elementResizeStarted: Bool
     
@@ -83,7 +83,7 @@ struct SelectedElementView: View {
                 // Shows the connection points and drawing line when the selected element connection point is hovered
                 if isShowingRelationshipConnectionPoints {
                     DrawingLineView(isDrawing: $isDrawingLine, startPoint: $startPoint, endPoint: $endPoint)
-                    if let elements = viewModel.umlModel?.elements {
+                    if let elements = viewModel.umlModel.elements {
                         ForEach(Array(elements), id: \.key) { key, element in
                             if key != viewModel.selectedElement?.id {
                                 if element.type?.isElementNotSelectable != true {
@@ -99,7 +99,7 @@ struct SelectedElementView: View {
                 
                 // The button for the moving of the selected element
                 if !elementResizeStarted {
-                    MoveSelectedItemButton(viewModel: viewModel)
+                    MoveSelectedItemButton()
                         .position(CGPoint(x: bounds.x - 25, y: bounds.y + (bounds.height + 25)))
                         .gesture(
                             DragGesture()
@@ -146,8 +146,8 @@ struct SelectedElementView: View {
                 }
             }.onChange(of: isConnectionSelected) {
                 // Adds a new relationship to the model, if a connection point was found
-                let relationship = UMLRelationship(type: viewModel.diagramType?.diagramRelationshipTypes.first, source: self.source, target: self.target)
-                viewModel.umlModel?.relationships?[relationship.id ?? ""] = relationship
+                let relationship = UMLRelationship(type: viewModel.diagramType.diagramRelationshipTypes.first, source: self.source, target: self.target)
+                viewModel.umlModel.relationships?[relationship.id ?? ""] = relationship
                 viewModel.updateRelationshipPosition()
                 isConnectionSelected = false
                 viewModel.selectedElement = nil

@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct ObjectDiagramRelationshipEditView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     
     var body: some View {

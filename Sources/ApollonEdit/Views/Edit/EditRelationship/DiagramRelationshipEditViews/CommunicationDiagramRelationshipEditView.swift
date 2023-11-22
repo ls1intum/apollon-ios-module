@@ -3,7 +3,7 @@ import ApollonShared
 import ApollonRenderer
 
 struct CommunicationDiagramRelationshipEditView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     @Binding var sourceElement: String
     @Binding var targetElement: String
@@ -109,9 +109,9 @@ struct EditOrAddLinkMessage: View {
         Binding(
             get: { message.name ?? "" },
             set: { newName in
-                if let relationship = viewModel.umlModel?.relationships?.first(where: { $0.key == parentRelationship.id }) {
+                if let relationship = viewModel.umlModel.relationships?.first(where: { $0.key == parentRelationship.id }) {
                     if let foundMessage = parentRelationship.messages?.first(where: { $0.key == message.id}) {
-                        viewModel.umlModel?.relationships?[relationship.key]?.messages?[foundMessage.key]?.name = newName
+                        viewModel.umlModel.relationships?[relationship.key]?.messages?[foundMessage.key]?.name = newName
                     }
                 }
             }

@@ -2,7 +2,7 @@ import SwiftUI
 import ApollonShared
 
 struct SelectedRelationshipView: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     
     var body: some View {
         if let relationship = (viewModel.selectedElement as? UMLRelationship) {
