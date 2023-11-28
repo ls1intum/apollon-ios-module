@@ -17,16 +17,16 @@ public class UMLRelationship: Codable, SelectableUMLItem {
     
     /// Public Init, so that new UML relationships can be created
     public init(id: String? = nil, name: String? = nil, type: UMLRelationshipType? = nil, owner: String? = nil, bounds: Boundary? = nil, assessmentNote: String? = nil, path: [PathPoint]? = nil, source: UMLRelationshipEndPoint? = nil, target: UMLRelationshipEndPoint? = nil, isManuallyLayouted: Bool? = nil, messages: [String : UMLElement]? = nil) {
-        self.id = id ?? UUID().uuidString
-        self.name = name
+        self.id = id ?? UUID().uuidString.lowercased()
+        self.name = name ?? ""
         self.type = type
-        self.owner = owner
+        self.owner = owner ?? ""
         self.bounds = bounds
         self.assessmentNote = assessmentNote
         self.path = path
         self.source = source
         self.target = target
-        self.isManuallyLayouted = isManuallyLayouted
+        self.isManuallyLayouted = isManuallyLayouted ?? false
         self.messages = messages
     }
     

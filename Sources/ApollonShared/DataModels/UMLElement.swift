@@ -10,17 +10,21 @@ public class UMLElement: Codable, SelectableUMLItem {
     public var bounds: Boundary?
     public var direction: ElementDirection?
     public var assessmentNote: String?
+    public var attributes: [String]?
+    public var methods: [String]?
     public var children: [UMLElement]? = [] // not decoded
 
     /// Public Init, so that new UML elements can be created
-    public init(id: String? = nil, name: String? = nil, type: UMLElementType? = nil, owner: String? = nil, bounds: Boundary? = nil, direction: ElementDirection? = nil, assessmentNote: String? = nil) {
-        self.id = id ?? UUID().uuidString
+    public init(id: String? = nil, name: String? = nil, type: UMLElementType? = nil, owner: String? = nil, bounds: Boundary? = nil, direction: ElementDirection? = nil, assessmentNote: String? = nil, attributes: [String]? = nil, methods: [String]? = nil) {
+        self.id = id ?? UUID().uuidString.lowercased()
         self.name = name ?? type?.rawValue
         self.type = type
         self.owner = owner
         self.bounds = bounds
         self.direction = direction
         self.assessmentNote = assessmentNote
+        self.attributes = attributes ?? []
+        self.methods = methods ?? []
     }
 
     /// UMLElement Coding Keys
@@ -32,10 +36,13 @@ public class UMLElement: Codable, SelectableUMLItem {
         case bounds
         case direction
         case assessmentNote
+        case attributes
+        case methods
     }
 
     /// Public encode function to encode elements without the children property
     public func encode(to encoder: Encoder) throws {
+        self.encodeChildrenToArray()
         var container = encoder.container(keyedBy: UMLElementCodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
@@ -44,6 +51,8 @@ public class UMLElement: Codable, SelectableUMLItem {
         try container.encode(bounds, forKey: .bounds)
         try container.encode(direction, forKey: .direction)
         try container.encode(assessmentNote, forKey: .assessmentNote)
+        try container.encode(attributes, forKey: .attributes)
+        try container.encode(methods, forKey: .methods)
     }
 
     /// Children of this element sorted by their vertical position (top to bottom)
@@ -127,10 +136,23 @@ public class UMLElement: Codable, SelectableUMLItem {
         guard let bounds else {
             return false
         }
-
+        
         let isXWithinBounds = point.x > bounds.x && point.x < (bounds.x + bounds.width)
         let isYWithinBounds = point.y > bounds.y && point.y < (bounds.y + bounds.height)
 
         return isXWithinBounds && isYWithinBounds
+    }
+
+    public func encodeChildrenToArray() {
+        if let children {
+            for child in children {
+                if [UMLElementType.classAttribute, .objectAttribute].contains(child.type) {
+                    self.attributes?.append(child.id ?? "")
+                }
+                if [UMLElementType.classMethod, .objectMethod].contains(child.type) {
+                    self.methods?.append(child.id ?? "")
+                }
+            }
+        }
     }
 }

@@ -29,7 +29,7 @@ struct UMLRendererEdit: View {
                         SelectedRelationshipView(viewModel: viewModel)
                     }
                 }
-                Rectangle().stroke(.blue, lineWidth: 1)
+                //Rectangle().stroke(.blue, lineWidth: 1)
             }.frame(width: max(viewModel.umlModel.size?.width ?? 1, viewModel.initialDiagramSize.width),
                     height: max(viewModel.umlModel.size?.height ?? 1, viewModel.initialDiagramSize.height))
         }.scaleEffect(viewModel.scale * viewModel.progressingScale)

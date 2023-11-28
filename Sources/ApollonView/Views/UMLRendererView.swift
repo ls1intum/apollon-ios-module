@@ -16,8 +16,9 @@ struct UMLRendererView: View {
                         viewModel.render(&context, size: size)
                     }
                 }
+                .frame(width: viewModel.umlModel.size?.width ?? 1, height: viewModel.umlModel.size?.height ?? 1)
             }.onAppear {
-                gridBackgroundViewModel.gridSize = CGSize(width: geometry.size.width, height: geometry.size.height)
+                gridBackgroundViewModel.gridSize = CGSize(width: geometry.size.width * 2, height: geometry.size.height * 2)
             }
         }
     }

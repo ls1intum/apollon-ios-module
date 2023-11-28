@@ -136,7 +136,6 @@ open class ApollonEditViewModel: ApollonViewModel {
                         }
                     }
                 }
-                print("")
             }
         }
     }
