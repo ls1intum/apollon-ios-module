@@ -8,7 +8,7 @@ This package will be integrated into the following clients:
 
 - [Artemis iOS App](https://github.com/ls1intum/artemis-ios) – Native iOS application for Artemis
 - [Themis](https://github.com/ls1intum/Themis) – An iPad app that provides a comprehensive and optimized way for tutors to assess student submissions on the go.
-- Apollon iOS Standalone - A standalone modeling application that allows users to freely create, edit, and view UML diagrams from the comfort of their iOS device.
+- [Apollon iOS Standalone](https://github.com/ls1intum/apollon-ios-standalone) - A standalone modeling application that allows users to freely create, edit, and view UML diagrams from the comfort of their iOS device.
 
 # Modules
 
