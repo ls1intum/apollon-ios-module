@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct ResetZoomAndPositionButton: View {
-    @ObservedObject var viewModel: ApollonEditViewModel
-    
+    @ObservedObject var viewModel: ApollonViewViewModel
+
     var body: some View {
         Button {
             viewModel.setDragLocation()

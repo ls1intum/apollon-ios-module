@@ -3,7 +3,7 @@ import ApollonShared
 
 public struct ApollonView: View {
     @StateObject var viewModel: ApollonViewViewModel
-
+    
     public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
         self._viewModel = StateObject(wrappedValue: ApollonViewViewModel(umlModel: umlModel,
                                                                          diagramType: diagramType,
@@ -11,10 +11,18 @@ public struct ApollonView: View {
                                                                          diagramOffset: diagramOffset,
                                                                          isGridBackground: isGridBackground))
     }
-
+    
     public var body: some View {
-        ZStack {
-            UMLRendererView(viewModel: viewModel)
+        GeometryReader { geometry in
+            ZStack(alignment: .topLeading) {
+                UMLRendererView(viewModel: viewModel)
+                if viewModel.isGridBackground {
+                    ResetZoomAndPositionButton(viewModel: viewModel)
+                }
+            }
+            .onAppear() {
+                viewModel.setupScale(geometrySize: geometry.size)
+            }
         }
     }
 }
