@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct GridBackgroundView: View {
     @ObservedObject var gridBackgroundViewModel: GridBackgroundViewModel
-    
+
     public init(gridBackgroundViewModel: GridBackgroundViewModel) {
         self.gridBackgroundViewModel = gridBackgroundViewModel
     }
@@ -11,11 +11,11 @@ public struct GridBackgroundView: View {
         ZStack {
             Image("UMLGridBackground", bundle: .module)
                 .resizable(resizingMode: .tile)
-                .frame(width: gridBackgroundViewModel.gridSize.width, height: gridBackgroundViewModel.gridSize.height)
+                .frame(width: gridBackgroundViewModel.gridSize?.width ?? nil, height: gridBackgroundViewModel.gridSize?.height ?? nil)
             if gridBackgroundViewModel.showGridBackgroundBorder {
                 Rectangle()
                     .stroke(.blue, lineWidth: 4)
-                    .frame(width: gridBackgroundViewModel.gridSize.width + 2, height: gridBackgroundViewModel.gridSize.height + 2)
+                    .frame(width: gridBackgroundViewModel.gridSize?.width, height: gridBackgroundViewModel.gridSize?.height)
             }
         }.ignoresSafeArea(.all)
     }

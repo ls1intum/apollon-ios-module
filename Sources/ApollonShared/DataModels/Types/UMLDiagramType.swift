@@ -72,9 +72,10 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
     }
     
     /// Returns true, if the diagram type has no supported renderer yet.
+    // Soon: Communication Diagram
     public static func isDiagramTypeUnsupported(diagramType: UMLDiagramType) -> Bool {
         switch diagramType {
-        case .classDiagram, .objectDiagram, .useCaseDiagram, .communicationDiagram:
+        case .classDiagram, .objectDiagram, .useCaseDiagram:
             return false
         default:
             return true

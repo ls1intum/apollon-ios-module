@@ -2,10 +2,10 @@ import SwiftUI
 import ApollonShared
 
 public struct ApollonView: View {
-    @StateObject var viewModel: ApollonViewViewModel
-    
+    @ObservedObject var viewModel: ApollonViewViewModel
+
     public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
-        self._viewModel = StateObject(wrappedValue: ApollonViewViewModel(umlModel: umlModel,
+        self._viewModel = ObservedObject(wrappedValue: ApollonViewViewModel(umlModel: umlModel,
                                                                          diagramType: diagramType,
                                                                          fontSize: fontSize,
                                                                          diagramOffset: diagramOffset,
@@ -21,7 +21,9 @@ public struct ApollonView: View {
                 }
             }
             .onAppear() {
-                viewModel.setupScale(geometrySize: geometry.size)
+                if viewModel.isGridBackground {
+                    viewModel.setupScale(geometrySize: geometry.size)
+                }
             }
         }
     }
