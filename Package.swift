@@ -20,10 +20,15 @@ let package = Package(
         .library(
             name: "ApollonEdit",
             targets: ["ApollonEdit"]
+        ),
+        .library(
+            name: "ApollonFeedback",
+            targets: ["ApollonFeedback"]
         )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
+        .package(url: "https://github.com/ls1intum/artemis-ios-core-modules", .upToNextMajor(from: "7.0.1")),
         .package(url: "https://github.com/SwiftyBeaver/SwiftyBeaver.git", .upToNextMajor(from: "1.9.0"))
     ],
     targets: [
@@ -34,15 +39,28 @@ let package = Package(
         ),
         .target(
             name: "ApollonRenderer",
-            dependencies: ["SwiftyBeaver", "ApollonShared"]
+            dependencies: ["SwiftyBeaver", 
+                           "ApollonShared"
+                          ]
         ),
         .target(
             name: "ApollonView",
-            dependencies: ["ApollonRenderer", "ApollonShared"]
+            dependencies: ["ApollonRenderer", 
+                           "ApollonShared"
+                          ]
         ),
         .target(
             name: "ApollonEdit",
-            dependencies: ["ApollonRenderer", "ApollonShared"]
+            dependencies: ["ApollonRenderer", 
+                           "ApollonShared"
+                          ]
+        ),
+        .target(
+            name: "ApollonFeedback",
+            dependencies: ["ApollonRenderer",
+                           "ApollonShared",
+                           .product(name: "SharedModels", package: "artemis-ios-core-modules")
+                          ]
         )
     ]
 )
