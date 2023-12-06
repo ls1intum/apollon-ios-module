@@ -37,7 +37,7 @@ struct UMLRendererEdit: View {
         .position(viewModel.currentDragLocation)
         .onAppear{
             gridSize = CGSize(width: viewModel.geometrySize.width * 8, height: viewModel.geometrySize.height * 8)
-            gridBackgroundViewModel.gridSize = gridSize
+            gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 8, height: viewModel.geometrySize.height * 8)
             gridBackgroundViewModel.showGridBackgroundBorder = true
             viewModel.setDragLocation()
         }.onChange(of: viewModel.initialDiagramSize) {

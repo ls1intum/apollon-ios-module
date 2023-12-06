@@ -1,16 +1,21 @@
 import SwiftUI
 import ApollonShared
 
-struct UMLRendererView: View {
+struct UMLRendererView<Content: View>: View {
     @ObservedObject var viewModel: ApollonViewViewModel
     @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
+    @ViewBuilder var content: Content
 
     var body: some View {
         if viewModel.isGridBackground {
             ZStack {
                 GridBackgroundView(gridBackgroundViewModel: gridBackgroundViewModel)
-                Canvas(rendersAsynchronously: true) { context, size in
-                    viewModel.render(&context, size: size)
+                Group {
+                    Canvas(rendersAsynchronously: true) { context, size in
+                        viewModel.render(&context, size: size)
+                    }
+                    content
+                    Rectangle().stroke(.blue, lineWidth: 1)
                 }
                 .frame(width: viewModel.umlModel.size?.width, height: viewModel.umlModel.size?.height)
             }
@@ -20,13 +25,15 @@ struct UMLRendererView: View {
                 gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 7, height: viewModel.geometrySize.height * 7)
                 gridBackgroundViewModel.showGridBackgroundBorder = true
                 viewModel.setDragLocation()
-            }.gesture(
+            }
+            .gesture(
                 DragGesture()
                     .onChanged(viewModel.handleDiagramDrag)
                     .onEnded { _ in
                         viewModel.dragStarted = true
                     }
-            ).simultaneousGesture(
+            )
+            .simultaneousGesture(
                 MagnificationGesture()
                     .onChanged(viewModel.handleDiagramMagnification)
                     .onEnded(viewModel.handleDiagramMagnificationEnd)

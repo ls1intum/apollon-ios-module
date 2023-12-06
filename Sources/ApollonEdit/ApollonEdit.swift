@@ -4,7 +4,7 @@ import ApollonShared
 public struct ApollonEdit: View {
     @StateObject var viewModel: ApollonEditViewModel
     @State private var isShowingAddElementMenu: Bool = false
-    @Binding var bindingUMLModel: UMLModel
+    @Binding private var bindingUMLModel: UMLModel
     
     public init(umlModel: Binding<UMLModel>, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
         self._bindingUMLModel = umlModel
