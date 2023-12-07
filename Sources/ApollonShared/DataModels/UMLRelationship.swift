@@ -83,6 +83,7 @@ public class UMLRelationship: Codable, SelectableUMLItem {
         return result
     }
     
+    /// Calculates the mid point of a relationship
     public var badgeLocation: CGPoint? {
         guard let path, let boundsAsCGRect else {
             return nil

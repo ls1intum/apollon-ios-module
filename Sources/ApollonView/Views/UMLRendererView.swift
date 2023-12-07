@@ -4,7 +4,7 @@ import ApollonShared
 struct UMLRendererView<Content: View>: View {
     @ObservedObject var viewModel: ApollonViewViewModel
     @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
-    @ViewBuilder var content: Content
+    @ViewBuilder var extraContent: Content
 
     var body: some View {
         if viewModel.isGridBackground {
@@ -14,10 +14,9 @@ struct UMLRendererView<Content: View>: View {
                     Canvas(rendersAsynchronously: true) { context, size in
                         viewModel.render(&context, size: size)
                     }
-                    content
-                    Rectangle().stroke(.blue, lineWidth: 1)
+                    extraContent
                 }
-                .frame(width: viewModel.umlModel.size?.width, height: viewModel.umlModel.size?.height)
+                .frame(width: (viewModel.umlModel.size?.width ?? 1) + (viewModel.diagramOffset.x * 2), height: (viewModel.umlModel.size?.height ?? 1) + (viewModel.diagramOffset.y * 2))
             }
             .scaleEffect(viewModel.scale * viewModel.progressingScale)
             .position(viewModel.currentDragLocation)
@@ -43,7 +42,7 @@ struct UMLRendererView<Content: View>: View {
                 Canvas(rendersAsynchronously: true) { context, size in
                     viewModel.render(&context, size: size)
                 }
-                .frame(width: viewModel.umlModel.size?.width ?? 1, height: viewModel.umlModel.size?.height ?? 1)
+                .frame(width: (viewModel.umlModel.size?.width ?? 1) + (viewModel.diagramOffset.x * 2), height: (viewModel.umlModel.size?.height ?? 1) + (viewModel.diagramOffset.y * 2))
             }
         }
     }
