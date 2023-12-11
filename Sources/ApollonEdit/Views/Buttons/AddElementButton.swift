@@ -11,7 +11,7 @@ struct AddElementButton: View {
             Image(systemName: "plus.circle.fill")
                 .resizable()
                 .frame(width: 60, height: 60)
-                .foregroundColor(Color.blue)
+                .foregroundColor(viewModel.themeColor)
                 .symbolRenderingMode(.hierarchical)
         }.frame(maxWidth: .infinity, alignment: .center)
     }

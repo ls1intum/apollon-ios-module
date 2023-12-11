@@ -8,7 +8,7 @@ struct SelectedRelationshipView: View {
         if let relationship = (viewModel.selectedElement as? UMLRelationship) {
             if let pathWithPoints = relationship.pathWithCGPoints {
                 pathWithPoints
-                    .stroke(Color.blue, lineWidth: 15)
+                    .stroke(viewModel.themeColor, lineWidth: 15)
                     .opacity(0.5)
                 EditSelectedItemButton(viewModel: viewModel)
                     .position(relationship.badgeLocation ?? .zero)

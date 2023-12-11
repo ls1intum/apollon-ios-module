@@ -6,11 +6,12 @@ public struct ApollonEdit: View {
     @State private var isShowingAddElementMenu: Bool = false
     @Binding private var bindingUMLModel: UMLModel
     
-    public init(umlModel: Binding<UMLModel>, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
+    public init(umlModel: Binding<UMLModel>, diagramType: UMLDiagramType, fontSize: CGFloat, themeColor: Color, diagramOffset: CGPoint, isGridBackground: Bool) {
         self._bindingUMLModel = umlModel
         self._viewModel = StateObject(wrappedValue: ApollonEditViewModel(umlModel: umlModel.wrappedValue,
                                                                          diagramType: diagramType,
                                                                          fontSize: fontSize,
+                                                                         themeColor: themeColor,
                                                                          diagramOffset: diagramOffset,
                                                                          isGridBackground: isGridBackground))
     }
@@ -25,7 +26,7 @@ public struct ApollonEdit: View {
                     AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
                         .popover(isPresented: $isShowingAddElementMenu) {
                             ZStack {
-                                Color.blue
+                                viewModel.themeColor
                                     .scaleEffect(1.5)
                                     .opacity(0.5)
                                 ElementAddView(viewModel: viewModel)

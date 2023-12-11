@@ -61,6 +61,7 @@ import ApollonEdit
 ApollonEdit(umlModel: Binding<UMLModel>,
             diagramType: UMLDiagramType,
             fontSize: CGFloat,
+            themeColor: Color,
             diagramOffset: CGPoint,
             isGridBackground: Bool)
 ```
@@ -72,8 +73,10 @@ import ApollonView
 ApollonView(umlModel: UMLModel,
             diagramType: UMLDiagramType,
             fontSize: CGFloat,
+            themeColor: Color,
             diagramOffset: CGPoint,
-            isGridBackground: Bool)
+            isGridBackground: Bool,
+            @ViewBuilder content: () -> Content)
 ```
 
 

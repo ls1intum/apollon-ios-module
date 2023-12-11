@@ -23,13 +23,13 @@ struct SelectedElementView: View {
             ZStack {
                 //SELECTED ITEM
                 Rectangle()
-                    .stroke(Color.blue, lineWidth: 5)
+                    .stroke(viewModel.themeColor, lineWidth: 5)
                     .opacity(0.5)
                     .frame(width: bounds.width, height: bounds.height)
                     .position(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2))
                 
                 // UP
-                RelationshipConnectionPoint(trimFrom: 0.5, trimTo: 1, x: bounds.x + (bounds.width / 2), y: bounds.y)
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, x: bounds.x + (bounds.width / 2), y: bounds.y)
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -42,7 +42,7 @@ struct SelectedElementView: View {
                     )
                 
                 // DOWN
-                RelationshipConnectionPoint(trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -55,7 +55,7 @@ struct SelectedElementView: View {
                     )
                 
                 // LEFT
-                RelationshipConnectionPoint(trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -68,7 +68,7 @@ struct SelectedElementView: View {
                     )
                 
                 // RIGHT
-                RelationshipConnectionPoint(trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -88,6 +88,7 @@ struct SelectedElementView: View {
                             if key != viewModel.selectedElement?.id {
                                 if element.type?.isElementNotSelectable != true {
                                     RelationshipConnectionPoints(element: element,
+                                                                 color: viewModel.themeColor,
                                                                  target: $target,
                                                                  endPoint: $endPoint,
                                                                  isConnectionSelected: $isConnectionSelected)
@@ -99,7 +100,7 @@ struct SelectedElementView: View {
                 
                 // The button for the moving of the selected element
                 if !elementResizeStarted {
-                    MoveSelectedItemButton()
+                    MoveSelectedItemButton(viewModel: viewModel)
                         .position(CGPoint(x: bounds.x - 25, y: bounds.y + (bounds.height + 25)))
                         .gesture(
                             DragGesture()
@@ -109,8 +110,9 @@ struct SelectedElementView: View {
                                     viewModel.selectedElementBounds?.y = value.location.y - (bounds.height + 25)
                                 }
                                 .onEnded { value in
-                                    viewModel.updateElementPosition(location: CGPoint(x: value.location.x + 25, y: value.location.y - (bounds.height + 25)))
-                                    viewModel.adjustDiagramSizeForSelectedElement()
+                                    //viewModel.updateElementPosition(location: CGPoint(x: value.location.x + 25, y: value.location.y - (bounds.height + 25)))
+                                    viewModel.updateElementPosition(value: value)
+                                    viewModel.adjustDiagramSize()
                                     viewModel.updateRelationshipPosition()
                                     elementMoveStarted = false
                                     viewModel.selectedElement = nil
@@ -130,7 +132,7 @@ struct SelectedElementView: View {
                                     }
                                     .onEnded { value in
                                         viewModel.updateElementSize(drag: elementResizeBounds)
-                                        viewModel.adjustDiagramSizeForSelectedElement()
+                                        viewModel.adjustDiagramSize()
                                         viewModel.updateRelationshipPosition()
                                         elementResizeStarted = false
                                         viewModel.selectedElement = nil
@@ -190,6 +192,7 @@ struct SelectedElementView: View {
 
 // The connection point, where relationships can be connected to and from
 struct RelationshipConnectionPoint: View {
+    let color: Color
     let trimFrom: Double
     let trimTo: Double
     var rotation: Double = 0.0
@@ -200,7 +203,7 @@ struct RelationshipConnectionPoint: View {
         Circle()
             .trim(from: trimFrom, to: trimTo)
             .rotation(.degrees(rotation))
-            .fill(Color.blue)
+            .fill(color)
             .frame(width: 50, height: 50)
             .position(x: x, y: y)
     }
@@ -209,6 +212,7 @@ struct RelationshipConnectionPoint: View {
 // A struct that holds all connection points of all elements that can be connected to
 struct RelationshipConnectionPoints: View {
     let element: UMLElement
+    let color: Color
     @Binding var target: UMLRelationshipEndPoint
     @Binding var endPoint: CGPoint
     @Binding var isConnectionSelected: Bool
@@ -216,28 +220,28 @@ struct RelationshipConnectionPoints: View {
     var body: some View {
         if let bounds = element.bounds {
             // UP
-            RelationshipConnectionPoint(trimFrom: 0.5, trimTo: 1, x: bounds.x + (bounds.width / 2), y: bounds.y)
+            RelationshipConnectionPoint(color: color, trimFrom: 0.5, trimTo: 1, x: bounds.x + (bounds.width / 2), y: bounds.y)
                 .opacity(0.5)
                 .onDisappear() {
                     handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 25, connectionPointY: bounds.y - 25, direction: .up)
                 }
             
             // DOWN
-            RelationshipConnectionPoint(trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
+            RelationshipConnectionPoint(color: color, trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
                 .opacity(0.5)
                 .onDisappear() {
                     handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 25, connectionPointY: bounds.y + bounds.height - 25, direction: .down)
                 }
             
             // LEFT
-            RelationshipConnectionPoint(trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
+            RelationshipConnectionPoint(color: color, trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
                 .opacity(0.5)
                 .onDisappear() {
                     handleOnDisappear(connectionPointX: bounds.x - 25, connectionPointY: bounds.y + (bounds.height / 2) - 25, direction: .left)
                 }
             
             // RIGHT
-            RelationshipConnectionPoint(trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
+            RelationshipConnectionPoint(color: color, trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
                 .opacity(0.5)
                 .onDisappear() {
                     handleOnDisappear(connectionPointX: bounds.x + bounds.width - 25, connectionPointY: bounds.y + (bounds.height / 2) - 25, direction: .right)

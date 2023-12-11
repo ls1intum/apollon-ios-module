@@ -15,12 +15,13 @@ struct EditSelectedItemButton: View {
                 .padding(5)
                 .background {
                     Circle()
-                        .foregroundColor(.blue)
+                        .foregroundColor(viewModel.themeColor)
                 }
         }.sheet(isPresented: $isShowingPopup, onDismiss: {
+            viewModel.adjustDiagramSize()
+            viewModel.updateRelationshipPosition()
             isShowingPopup = false
             viewModel.selectedElement = nil
-            
         }) {
             if viewModel.selectedElement is UMLElement {
                 ElementEditPopUpView(viewModel: viewModel, isShowingPopup: $isShowingPopup)

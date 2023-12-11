@@ -11,8 +11,16 @@ public struct Diagram: Codable {
     public init(id: String? = nil, title: String? = nil, lastUpdate: String? = nil, diagramType: UMLDiagramType? = nil, model: UMLModel? = nil) {
         self.id = id ?? UUID().uuidString.lowercased()
         self.title = title ?? ""
-        self.lastUpdate = lastUpdate ?? Date().ISO8601Format()
+        self.lastUpdate = lastUpdate ?? Date().ISO8601FormatWithFractionalSeconds()
         self.diagramType = diagramType
         self.model = model ?? UMLModel()
+    }
+}
+
+extension Date {
+    func ISO8601FormatWithFractionalSeconds() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return formatter.string(from: self)
     }
 }

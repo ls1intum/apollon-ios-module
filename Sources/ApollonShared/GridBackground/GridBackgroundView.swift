@@ -14,7 +14,7 @@ public struct GridBackgroundView: View {
                 .frame(width: gridBackgroundViewModel.gridSize?.width ?? nil, height: gridBackgroundViewModel.gridSize?.height ?? nil)
             if gridBackgroundViewModel.showGridBackgroundBorder {
                 Rectangle()
-                    .stroke(.blue, lineWidth: 4)
+                    .stroke(gridBackgroundViewModel.gridBackgroundBorderColor ?? .blue, lineWidth: 4)
                     .frame(width: gridBackgroundViewModel.gridSize?.width, height: gridBackgroundViewModel.gridSize?.height)
             }
         }.ignoresSafeArea(.all)

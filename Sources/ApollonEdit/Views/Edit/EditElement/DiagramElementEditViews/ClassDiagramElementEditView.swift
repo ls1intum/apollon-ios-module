@@ -31,8 +31,8 @@ struct ClassDiagramElementEditView: View {
                     }
                 }) {
                     Text("Abstract").padding(10)
-                }.buttonStyle(RoundedButtonStyle(selected: selectedButton == 0 || (viewModel.selectedElement as? UMLElement)?.type == .abstractClass))
-                
+                }.buttonStyle(RoundedButtonStyle(selected: selectedButton == 0 || (viewModel.selectedElement as? UMLElement)?.type == .abstractClass, color: viewModel.themeColor))
+
                 Spacer()
                 
                 Button(action: {
@@ -46,8 +46,8 @@ struct ClassDiagramElementEditView: View {
                     }
                 }) {
                     Text("Interface").padding(10)
-                }.buttonStyle(RoundedButtonStyle(selected: selectedButton == 1 || (viewModel.selectedElement as? UMLElement)?.type == .interface))
-                
+                }.buttonStyle(RoundedButtonStyle(selected: selectedButton == 1 || (viewModel.selectedElement as? UMLElement)?.type == .interface, color: viewModel.themeColor))
+
                 Spacer()
                 
                 Button(action: {
@@ -61,7 +61,7 @@ struct ClassDiagramElementEditView: View {
                 }) {
                     Text("Enumeration").padding(10)
                 }
-                .buttonStyle(RoundedButtonStyle(selected: selectedButton == 2 || (viewModel.selectedElement as? UMLElement)?.type == .enumeration))
+                .buttonStyle(RoundedButtonStyle(selected: selectedButton == 2 || (viewModel.selectedElement as? UMLElement)?.type == .enumeration, color: viewModel.themeColor))
             }
             .frame(maxWidth: .infinity)
             .padding([.leading, .trailing], 15)
@@ -88,14 +88,15 @@ struct ClassDiagramElementEditView: View {
 // The buttonstyle for the different element types button
 struct RoundedButtonStyle: ButtonStyle {
     let selected: Bool
+    let color: Color
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundColor(selected ? Color(UIColor.systemBackground) : Color.blue)
-            .background(selected ? Color.blue : Color.clear)
+            .foregroundColor(selected ? Color(UIColor.systemBackground) : color)
+            .background(selected ? color : Color.clear)
             .cornerRadius(5)
             .overlay(
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.blue, lineWidth: 1)
+                    .stroke(color, lineWidth: 1)
             )
     }
 }

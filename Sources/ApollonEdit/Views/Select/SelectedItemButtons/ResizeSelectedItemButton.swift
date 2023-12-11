@@ -12,7 +12,7 @@ struct ResizeSelectedItemButton: View {
             .padding(5)
             .background {
                 Circle()
-                    .foregroundColor(resizeBy == .none ? .gray : .blue)
+                    .foregroundColor(resizeBy == .none ? .gray : viewModel.themeColor)
             }
             .disabled(resizeBy == .none)
     }

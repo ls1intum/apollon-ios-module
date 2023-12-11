@@ -7,7 +7,6 @@ struct UMLRendererEdit: View {
 
     @State private var elementMoveStarted = false
     @State private var elementResizeStarted = false
-    @State private var gridSize: CGSize = .zero
 
     var body: some View {
         ZStack {
@@ -36,9 +35,9 @@ struct UMLRendererEdit: View {
         .scaleEffect(viewModel.scale * viewModel.progressingScale)
         .position(viewModel.currentDragLocation)
         .onAppear{
-            gridSize = CGSize(width: viewModel.geometrySize.width * 8, height: viewModel.geometrySize.height * 8)
             gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 8, height: viewModel.geometrySize.height * 8)
             gridBackgroundViewModel.showGridBackgroundBorder = true
+            gridBackgroundViewModel.gridBackgroundBorderColor = viewModel.themeColor
             viewModel.setDragLocation()
         }.onChange(of: viewModel.initialDiagramSize) {
             viewModel.calculateIdealScale()

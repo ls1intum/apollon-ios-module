@@ -7,13 +7,14 @@ open class ApollonViewModel: ObservableObject {
     @Published public var umlModel: UMLModel
     @Published public var diagramType: UMLDiagramType
     @Published public var fontSize: CGFloat
+    @Published public var themeColor: Color
     @Published public var diagramOffset: CGPoint
     @Published public var isGridBackground: Bool
     
     @Published public var geometrySize = CGSize.zero
     @Published public var initialDiagramSize = CGSize.zero
     
-    @Published public var startDragLocation = CGPoint.zero
+    public var startDragLocation = CGPoint.zero
     @Published public var currentDragLocation = CGPoint.zero
     @Published public var dragStarted = true
     
@@ -25,10 +26,11 @@ open class ApollonViewModel: ObservableObject {
     
     public var diagramTypeUnsupported = false
     
-    public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, diagramOffset: CGPoint, isGridBackground: Bool) {
+    public init(umlModel: UMLModel, diagramType: UMLDiagramType, fontSize: CGFloat, themeColor: Color, diagramOffset: CGPoint, isGridBackground: Bool) {
         self.umlModel = umlModel
         self.diagramType = diagramType
         self.fontSize = fontSize
+        self.themeColor = themeColor
         self.diagramOffset = diagramOffset
         self.isGridBackground = isGridBackground
         self.determineChildren()

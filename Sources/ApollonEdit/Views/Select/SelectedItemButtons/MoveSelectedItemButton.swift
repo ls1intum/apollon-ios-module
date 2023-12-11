@@ -1,6 +1,7 @@
 import SwiftUI
 
-struct MoveSelectedItemButton: View {    
+struct MoveSelectedItemButton: View { 
+    @ObservedObject var viewModel: ApollonEditViewModel
     var body: some View {
         Image(systemName: "arrow.up.and.down.and.arrow.left.and.right")
             .frame(width: 35, height: 35)
@@ -8,7 +9,7 @@ struct MoveSelectedItemButton: View {
             .padding(5)
             .background {
                 Circle()
-                    .foregroundColor(.blue)
+                    .foregroundColor(viewModel.themeColor)
             }
     }
 }

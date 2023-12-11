@@ -128,6 +128,13 @@ public class UMLRelationship: Codable, SelectableUMLItem {
         }
         return pathRects.contains(where: { $0.contains(point) })
     }
+
+    /// Swaps the source and target UMLRelationshipEndPoints
+    public func switchSourceAndTarget() {
+        let tempEndpoint = source
+        source = target
+        target = tempEndpoint
+    }
 }
 
 public struct PathPoint: Codable {

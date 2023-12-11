@@ -23,6 +23,7 @@ struct UMLRendererView<Content: View>: View {
             .onAppear{
                 gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 7, height: viewModel.geometrySize.height * 7)
                 gridBackgroundViewModel.showGridBackgroundBorder = true
+                gridBackgroundViewModel.gridBackgroundBorderColor = viewModel.themeColor
                 viewModel.setDragLocation()
             }
             .gesture(

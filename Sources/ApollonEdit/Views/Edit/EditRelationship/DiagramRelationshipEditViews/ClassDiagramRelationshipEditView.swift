@@ -66,12 +66,15 @@ struct ClassDiagramRelationshipEditView: View {
             Spacer()
             
             Button {
-                //TO DO
+                if let relationship = (viewModel.selectedElement as? UMLRelationship) {
+                    relationship.switchSourceAndTarget()
+                    viewModel.updateRelationshipPosition()
+                }
             } label: {
                 Image(systemName: "arrow.left.arrow.right")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .foregroundColor(Color.blue)
+                    .foregroundColor(viewModel.themeColor)
             }.frame(width: 30, height: 30)
             
             Button {
@@ -81,19 +84,21 @@ struct ClassDiagramRelationshipEditView: View {
                 Image(systemName: "trash")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .foregroundColor(Color.blue)
+                    .foregroundColor(viewModel.themeColor)
             }.frame(width: 30, height: 30)
             
             Button("Done") {
                 isShowingPopup = false
                 viewModel.selectedElement = nil
+                viewModel.adjustDiagramSize()
+                viewModel.updateRelationshipPosition()
             }.padding(10)
                 .foregroundColor(Color(UIColor.systemBackground))
-                .background(Color.blue)
+                .background(viewModel.themeColor)
                 .cornerRadius(5)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.blue, lineWidth: 1)
+                        .stroke(viewModel.themeColor, lineWidth: 1)
                 )
         }.padding([.leading, .top, .trailing], 15)
         
@@ -113,14 +118,14 @@ struct ClassDiagramRelationshipEditView: View {
                     .font(.title2)
                 Image(systemName: "arrowtriangle.down.fill")
                     .resizable()
-                    .tint(.blue)
+                    .tint(viewModel.themeColor)
                     .frame(width: 15, height: 15)
             }.frame(maxWidth: .infinity)
-                .tint(.blue)
+                .tint(viewModel.themeColor)
                 .padding(10)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(.blue, lineWidth: 1)
+                        .stroke(viewModel.themeColor, lineWidth: 1)
                 )
         }.padding([.leading, .trailing], 15)
             .onAppear {

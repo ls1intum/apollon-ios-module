@@ -67,6 +67,15 @@ public enum UMLElementType: String, Codable {
         }
     }
 
+    public var isContainer: Bool {
+        switch self {
+        case .package, .useCaseSystem:
+            return true
+        default:
+            return false
+        }
+    }
+
     /// The direction to which the element is resizable
     public var resizeBy: ResizeableDirection {
         switch self {

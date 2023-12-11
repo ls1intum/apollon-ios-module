@@ -16,7 +16,7 @@ struct ResetZoomAndPositionButton: View {
                 .padding(5)
                 .background {
                     RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(.blue)
+                        .foregroundColor(viewModel.themeColor)
                 }
         }.padding([.leading, .top], 10)
     }

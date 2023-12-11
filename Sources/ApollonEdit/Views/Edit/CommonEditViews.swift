@@ -19,13 +19,15 @@ struct ElementEditTopBar: View {
             Button("Done") {
                 isShowingPopup = false
                 viewModel.selectedElement = nil
+                viewModel.adjustDiagramSize()
+                viewModel.updateRelationshipPosition()
             }.padding(10)
                 .foregroundColor(Color(UIColor.systemBackground))
-                .background(Color.blue)
+                .background(viewModel.themeColor)
                 .cornerRadius(5)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.blue, lineWidth: 1)
+                        .stroke(viewModel.themeColor, lineWidth: 1)
                 )
         }.padding([.leading, .top, .trailing], 15)
     }
@@ -48,7 +50,7 @@ struct ElementNameEditView: View {
                 Image(systemName: "trash")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .foregroundColor(Color.blue)
+                    .foregroundColor(viewModel.themeColor)
             }.frame(width: 30, height: 30)
         }.padding([.leading, .trailing], 15)
     }
@@ -89,7 +91,7 @@ struct EditOrAddAttributeOrMethodView: View {
                     Image(systemName: "trash")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(viewModel.themeColor)
                 }.frame(width: 30, height: 30)
             }.padding([.leading, .trailing], 15)
         }
