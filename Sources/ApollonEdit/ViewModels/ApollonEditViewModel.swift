@@ -8,17 +8,19 @@ open class ApollonEditViewModel: ApollonViewModel {
     @Published var selectedElement: SelectableUMLItem?
     @Published var selectedElementBounds: Boundary?
 
+    /// Return the selected Item based on a given Point
     func selectItem(at point: CGPoint) {
         self.selectedElement = getSelectableItem(at: point)
         self.selectedElementBounds = self.selectedElement?.bounds
     }
 
+    /// Helper function for selectItem()
     private func getSelectableItem(at point: CGPoint) -> SelectableUMLItem? {
-        /// Check for UMLRelationship
+        // Check for UMLRelationship
         if let relationship = umlModel.relationships?.first(where: { $0.value.boundsContains(point: point) }) {
             return relationship.value
         }
-        /// Check for UMLElement
+        // Check for UMLElement
         if let element = umlModel.elements?.first(where: { $0.value.boundsContains(point: point) }) {
             if element.value.type?.isElementNotSelectable == true {
                 if let ownerName = element.value.owner {
@@ -36,6 +38,7 @@ open class ApollonEditViewModel: ApollonViewModel {
         return nil
     }
 
+    /// Remove the selectedItem
     func removeSelectedItem() {
         if let elements = umlModel.elements {
             for element in elements {
@@ -57,16 +60,17 @@ open class ApollonEditViewModel: ApollonViewModel {
         selectedElement = nil
     }
 
+    /// Update the position of an UMLElement
     func updateElementPosition(value: DragGesture.Value) {
         if let element = selectedElement as? UMLElement {
             updatePositionRecursivelyForAllChildren(element, translation: value.translation)
         }
     }
 
-    // Recursively check the children of each element and move them, until an element has no more children
+    /// Recursively check the children of each element and move them, until an element has no more children
     private func updatePositionRecursivelyForAllChildren(_ element: UMLElement, translation: CGSize) {
-        element.bounds?.x += translation.width
-        element.bounds?.y += translation.height
+        element.bounds?.x += translation.width.rounded(.towardZero)
+        element.bounds?.y += translation.height.rounded(.towardZero)
 
         if let children = element.children {
             for child in children {
@@ -90,6 +94,112 @@ open class ApollonEditViewModel: ApollonViewModel {
     //        }
     //    }
 
+    /// Updates the Element Size after dragging the resize button
+    func updateElementSize(drag: CGSize) {
+        let widthToAdd = drag.width.rounded(.towardZero)
+        let heightToAdd = drag.height.rounded(.towardZero)
+
+        if let element = selectedElement as? UMLElement {
+            element.bounds?.width += widthToAdd
+            element.bounds?.height += heightToAdd
+
+            if element.type?.isContainer == false {
+                if let children = element.children {
+                    for child in children {
+                        child.bounds?.width += widthToAdd
+                        child.bounds?.height += heightToAdd
+                    }
+                }
+            }
+        }
+    }
+
+    /// Adjust the diagram size based on the elements within the UMLModel
+    func adjustDiagramSize() {
+        let DIAGRAM_MARGIN = 40.0
+        var largestXBottomRight: CGFloat = 0.0
+        var largestYBottomRight: CGFloat = 0.0
+        var smallestXTopLeft: CGFloat = 0.0
+        var smallestYTopLeft: CGFloat = 0.0
+
+        if let elements = umlModel.elements {
+            for element in elements {
+                if let bounds = element.value.bounds {
+                    if bounds.x + bounds.width > largestXBottomRight {
+                        largestXBottomRight = bounds.x + bounds.width
+                    }
+                    if bounds.y + bounds.height > largestYBottomRight {
+                        largestYBottomRight = bounds.y + bounds.height
+                    }
+                    if bounds.x < smallestXTopLeft {
+                        smallestXTopLeft = bounds.x
+                    }
+                    if bounds.y < smallestYTopLeft {
+                        smallestYTopLeft = bounds.y
+                    }
+                }
+            }
+            umlModel.size?.width = largestXBottomRight + DIAGRAM_MARGIN
+            umlModel.size?.height = largestYBottomRight + DIAGRAM_MARGIN
+
+            if smallestXTopLeft < 0.0 || smallestYTopLeft < 0.0 {
+                for element in elements {
+                    element.value.bounds?.x += abs(smallestXTopLeft)
+                    element.value.bounds?.y += abs(smallestYTopLeft)
+                }
+                umlModel.size?.width += -(smallestXTopLeft) + DIAGRAM_MARGIN
+                umlModel.size?.height += -(smallestYTopLeft) + DIAGRAM_MARGIN
+            }
+            calculateIdealScale()
+        }
+    }
+
+    /// Adds an element to the UMLModel based on a UMLElementType
+    func addElement(type: UMLElementType) {
+        let COLLISION_OFFSET: CGFloat = 10.0
+        var pointToAddElement = CGPoint(x: ((umlModel.size?.width ?? 1) / 2).rounded(.towardZero) + 2, y: ((umlModel.size?.height ?? 1) / 2).rounded(.towardZero) + 2)
+
+        // Check if the pointToAddElement is contained in a different element, so there is no overlap
+        // TODO: Not working correctly...
+        if let collidedElement = umlModel.elements?.first(where: { $0.value.boundsContains(point: pointToAddElement) }) {
+            if let collidedbounds = collidedElement.value.bounds {
+                pointToAddElement.x = collidedbounds.x + collidedbounds.width + COLLISION_OFFSET
+                pointToAddElement.y = collidedbounds.y + collidedbounds.height + COLLISION_OFFSET
+            }
+        }
+        if let elementCreator = ElementCreatorFactory.createElementCreator(for: type) {
+            let elementsToAdd = elementCreator.createAllElements(for: type, middle: pointToAddElement)
+            for element in elementsToAdd {
+                if let elementId = element.id {
+                    umlModel.elements?[elementId] = element
+                }
+            }
+        } else {
+            log.error("Attempted to create an unknown element")
+        }
+    }
+
+    /// Returns an UMLElement based on a given element ID
+    func getElementById(elementId: String) -> UMLElement? {
+        if let element = umlModel.elements?.first(where: { $0.key == elementId }) {
+            return element.value
+        }
+        return nil
+    }
+
+    /// Returns the UMLElementType based on a given element ID
+    func getElementTypeById(elementId: String) -> UMLElementType? {
+        if let element = umlModel.elements?.first(where: { $0.key == elementId }) {
+            return element.value.type ?? nil
+        }
+        return nil
+    }
+}
+
+// MARK: Relationship path creating and editing adapted from the Apollon codebase
+// https://github.com/ls1intum/Apollon
+extension ApollonEditViewModel {
+    /// Updates and calculates all relationship paths between 2 endpoints
     func updateRelationshipPosition() {
         guard let relationships = umlModel.relationships else { return }
 
@@ -122,44 +232,47 @@ open class ApollonEditViewModel: ApollonViewModel {
                     path.append(startPoint)
                     path.append(endPoint)
                 } else {
-                    //
-                    let startPointMargin = sourcePortPoint.add(getMarginPoint(direction: sourceDirection))
-                    let endPointMargin = targetPortPoint.add(getMarginPoint(direction: targetDirection))
+                    let sourcePointMargin = sourcePortPoint.add(getMarginPoint(direction: sourceDirection))
+                    let targetPointMargin = targetPortPoint.add(getMarginPoint(direction: targetDirection))
 
                     path.append(startPoint)
                     path.append(startPoint.add(getMarginPoint(direction: sourceDirection)))
 
-                    // The variables help determine if the path segment should be horizontal or vertical
-                    let dx = abs(targetPortPoint.x - sourcePortPoint.x)
-                    let dy = abs(targetPortPoint.y - sourcePortPoint.y)
+                    // The delta helps determine if the path segment should be horizontal or vertical
+                    let delta = Delta(dx: abs(targetPortPoint.x - sourcePortPoint.x),
+                                      dy: abs(targetPortPoint.y - sourcePortPoint.y))
 
                     // Calculates if a horizontal or vertical path needs to be added and appends it to the path
                     // Positive stride step goes up and negative goes down
-                    if dx >= dy {
+                    if delta.dx >= delta.dy {
                         // Horizontal path
-                        let step = (endPointMargin.x > startPointMargin.x) ? 1 : -1
-                        for x in stride(from: startPointMargin.x, to: endPointMargin.x, by: Double(step)) {
-                            let y = startPointMargin.y // Keep y constant
-                            path.append(PathPoint(x: x - newBounds.x, y: y - newBounds.y))
+                        let step = (targetPointMargin.x > sourcePointMargin.x) ? 1.0 : -1.0
+                        for x in stride(from: sourcePointMargin.x, to: targetPointMargin.x + step, by: step) {
+                            let y = sourcePointMargin.y // Keep y constant
+                            path.append(PathPoint(x: (x - newBounds.x).rounded(.towardZero), y: (y - newBounds.y).rounded(.towardZero)))
                         }
                     } else {
                         // Vertical path
-                        let step = (endPointMargin.y > startPointMargin.y) ? 1 : -1
-                        for y in stride(from: startPointMargin.y, to: endPointMargin.y, by: Double(step)) {
-                            let x = startPointMargin.x // Keep x constant
-                            path.append(PathPoint(x: x - newBounds.x, y: y - newBounds.y))
+                        let step = (targetPointMargin.y > sourcePointMargin.y) ? 1.0 : -1.0
+                        for y in stride(from: sourcePointMargin.y, to: targetPointMargin.y + step, by: step) {
+                            let x = sourcePointMargin.x // Keep x constant
+                            path.append(PathPoint(x: (x - newBounds.x).rounded(.towardZero), y: (y - newBounds.y).rounded(.towardZero)))
                         }
                     }
 
-                    path.append(endPoint.add(getMarginPoint(direction: targetDirection)))
+                    var roundedEndPointWithMargin = endPoint.add(getMarginPoint(direction: targetDirection))
+                    roundedEndPointWithMargin.x = roundedEndPointWithMargin.x.rounded(.towardZero)
+                    roundedEndPointWithMargin.y = roundedEndPointWithMargin.y.rounded(.towardZero)
+
+                    path.append(roundedEndPointWithMargin)
                     path.append(endPoint)
                 }
-                relationship.value.path = path
+                relationship.value.path = beautifyPath(path: path)
             }
         }
     }
 
-    // Returns the point based on the direction of the relationship
+    /// Returns the point based on the direction of the relationship
     private func getPortsForElement(direction: Direction, elementBounds: Boundary) -> PathPoint {
         switch direction {
         case .up:
@@ -189,7 +302,7 @@ open class ApollonEditViewModel: ApollonViewModel {
         }
     }
 
-    // This returns the second point or second last point of the path which we call the margin point
+    /// Returns the second point or second last point of the path which we call the margin point
     private func getMarginPoint(direction: Direction) -> PathPoint {
         let ENTITY_MARGIN = 40.0
         switch direction {
@@ -204,87 +317,178 @@ open class ApollonEditViewModel: ApollonViewModel {
         }
     }
 
+    /// Calculates the boundary around 2 points
     private func calculateBoundaryAroundPoints(point1: PathPoint, point2: PathPoint) -> Boundary {
         return Boundary(x: min(point1.x, point2.x), y: min(point1.y, point2.y), width: abs(point2.x - point1.x), height: abs(point2.y - point1.y))
     }
 
-    func updateElementSize(drag: CGSize) {
-        if let element = selectedElement as? UMLElement {
-            element.bounds?.width += drag.width
-            element.bounds?.height += drag.height
-            if element.type?.isContainer == false {
-                if let children = element.children {
-                    for child in children {
-                        child.bounds?.width += drag.width
-                        child.bounds?.height += drag.height
-                    }
+    /// Makes the path nicer and removes unnecessary points
+    private func beautifyPath(path: [PathPoint]) -> [PathPoint] {
+        if path.count <= 1 {
+            return path
+        }
+        var path = path
+        path = removeConsecutiveIdenticalPoints(path: path)
+        path = mergeConsecutiveSameAxisDeltas(path: path)
+        path = flattenWaves(path: path)
+        path = removeTransitNodes(path: path)
+
+        return path;
+    }
+
+    /// Removes similar points
+    private func removeConsecutiveIdenticalPoints(path: [PathPoint]) -> [PathPoint] {
+        var newPath: [PathPoint] = []
+        for point in path {
+            let previousPoint = newPath.last
+            if previousPoint == nil || !pointsAreEqual(p: point, q: previousPoint!) {
+                newPath.append(point)
+            }
+        }
+        return newPath
+    }
+
+    /// Combine deltas on the same axis
+    private func mergeConsecutiveSameAxisDeltas(path: [PathPoint]) -> [PathPoint] {
+        let deltas = computePathDeltas(path: path)
+        if deltas.count <= 1 {
+            return path
+        }
+        var newDeltas: [Delta] = []
+        for delta in deltas {
+            if newDeltas.isEmpty {
+                newDeltas.append(delta)
+            } else if let previousDelta = newDeltas.last {
+                if (previousDelta.dx == 0 && delta.dx == 0) || (previousDelta.dy == 0 && delta.dy == 0) {
+                    newDeltas[newDeltas.count - 1] = Delta(dx: previousDelta.dx + delta.dx, dy: previousDelta.dy + delta.dy)
+                } else {
+                    newDeltas.append(delta)
                 }
             }
         }
+        return createPathFromDeltas(start: path[0], deltas: newDeltas)
     }
 
-    func adjustDiagramSize() {
-        var largestXBottomRight: CGFloat = 0.0
-        var largestYBottomRight: CGFloat = 0.0
-        var smallestXTopLeft: CGFloat = 0.0
-        var smallestYTopLeft: CGFloat = 0.0
-        if let elements = umlModel.elements {
-            for element in elements {
-                if let bounds = element.value.bounds {
-                    if bounds.x + bounds.width > largestXBottomRight {
-                        largestXBottomRight = bounds.x + bounds.width
-                    }
-                    if bounds.y + bounds.height > largestYBottomRight {
-                        largestYBottomRight = bounds.y + bounds.height
-                    }
-                    if bounds.x < smallestXTopLeft {
-                        smallestXTopLeft = bounds.x
-                    }
-                    if bounds.y < smallestYTopLeft {
-                        smallestYTopLeft = bounds.y
-                    }
-                }
-            }
-            umlModel.size?.width = largestXBottomRight + 1
-            umlModel.size?.height = largestYBottomRight + 1
+    /// Simplifies W-shaped path segments
+    private func flattenWaves(path: [PathPoint]) -> [PathPoint] {
+        if path.count < 4 {
+            return path
+        }
 
-            if smallestXTopLeft < 0.0 || smallestYTopLeft < 0.0 {
-                for elementOrigin in elements {
-                    elementOrigin.value.bounds?.x += -(smallestXTopLeft)
-                    elementOrigin.value.bounds?.y += -(smallestYTopLeft)
-                }
-                umlModel.size?.width += -(smallestXTopLeft) + 1
-                umlModel.size?.height += -(smallestYTopLeft) + 1
+        let deltas = computePathDeltas(path: path)
+        let simplifiedDeltas = simplifyDeltas(deltas)
+
+        let start = path[0]
+        let simplifiedPath = createPathFromDeltas(start: start, deltas: simplifiedDeltas)
+
+        return simplifiedPath
+    }
+
+    /// Removes transit nodes
+    private func removeTransitNodes(path: [PathPoint]) -> [PathPoint] {
+        for i in 0..<(path.count - 2) {
+            let p = path[i]
+            let q = path[i + 1]
+            let r = path[i + 2]
+            if isHorizontalLineSegment(p: p, q: q, r: r) || isVerticalLineSegment(p: p, q: q, r: r) {
+                let pointsBeforeQ = Array(path[0...i])
+                let pointsAfterQ = Array(path[(i + 2)...])
+                let pathWithoutQ = pointsBeforeQ + pointsAfterQ
+                return removeTransitNodes(path: pathWithoutQ)
             }
         }
+        return path
     }
 
-    func addElement(type: UMLElementType) {
-        let middle = CGPoint(x: (umlModel.size?.width ?? 1) / 2, y: (umlModel.size?.height ?? 1) / 2)
-        let elementCreator = ElementCreatorFactory.createElementCreator(for: type)
-        if let elementCreator {
-            let elementsToAdd = elementCreator.createAllElements(for: type, middle: middle)
-            for element in elementsToAdd {
-                if let elementId = element.id {
-                    umlModel.elements?[elementId] = element
-                }
+    /// Simplifies deltas
+    private func simplifyDeltas(_ deltas: [Delta]) -> [Delta] {
+        var simplifiedDeltas = deltas
+
+        for i in 0..<(deltas.count - 3) {
+            let d1 = deltas[i]
+            let d2 = deltas[i + 1]
+            let d3 = deltas[i + 2]
+            let d4 = deltas[i + 3]
+
+            if d1.dy == 0 && d2.dx == 0 && d3.dy == 0 &&
+                (d1.dx * d3.dx > 0) && (d2.dy * d4.dy > 0) {
+                simplifiedDeltas = simplifyDeltas(
+                    Array(simplifiedDeltas[0..<i]) +
+                    [Delta(dx: d1.dx + d3.dx, dy: 0), Delta(dx: 0, dy: d2.dy)] +
+                    Array(simplifiedDeltas[(i + 3)...])
+                )
+                break
             }
-        } else {
-            log.error("Attempted to create an unknown element")
+
+            if d1.dx == 0 && d2.dy == 0 && d3.dx == 0 &&
+                (d1.dy * d3.dy > 0) && (d2.dx * d4.dx > 0) {
+                simplifiedDeltas = simplifyDeltas(
+                    Array(simplifiedDeltas[0..<i]) +
+                    [Delta(dx: 0, dy: d1.dy + d3.dy), Delta(dx: d2.dx, dy: 0)] +
+                    Array(simplifiedDeltas[(i + 3)...])
+                )
+                break
+            }
         }
+
+        return simplifiedDeltas
     }
 
-    func getElementById(elementId: String) -> UMLElement? {
-        if let element = umlModel.elements?.first(where: { $0.key == elementId }) {
-            return element.value
+    /// Computes deltas for a given path
+    private func computePathDeltas(path: [PathPoint]) -> [Delta] {
+        var deltas: [Delta] = []
+        for i in 0..<path.count - 1 {
+            let p = path[i]
+            let q = path[i + 1]
+            let dx = q.x - p.x
+            let dy = q.y - p.y
+            deltas.append(Delta(dx: dx, dy: dy))
         }
-        return nil
+        return deltas
     }
 
-    func getElementTypeById(elementId: String) -> UMLElementType? {
-        if let element = umlModel.elements?.first(where: { $0.key == elementId }) {
-            return element.value.type ?? nil
+    /// Creates a path from a starting point and given deltas
+    private func createPathFromDeltas(start: PathPoint, deltas: [Delta]) -> [PathPoint] {
+        var points = [start]
+        var current = start
+        for delta in deltas {
+            let x = current.x + delta.dx
+            let y = current.y + delta.dy
+            current = PathPoint(x: x, y: y)
+            points.append(current)
         }
-        return nil
+        return points
+    }
+
+    /// Checks if line segment is horizontal
+    private func isHorizontalLineSegment(p: PathPoint, q: PathPoint, r: PathPoint) -> Bool {
+        return areAlmostEqual(a: p.y, b: q.y) && areAlmostEqual(a: q.y, b: r.y) && ((p.x >= q.x && q.x >= r.x) || (p.x <= q.x && q.x <= r.x))
+    }
+
+    /// Checks if line segment is vertical
+    private func isVerticalLineSegment(p: PathPoint, q: PathPoint, r: PathPoint) -> Bool {
+        return areAlmostEqual(a: p.x, b: q.x) && areAlmostEqual(a: q.x, b: r.x) && ((p.y <= q.y && q.y <= r.y) || (p.y >= q.y && q.y >= r.y))
+    }
+
+    /// Checks if value is almost zero
+    private func isAlmostZero(value: Double) -> Bool {
+        return abs(value) < 1e-6
+    }
+
+    /// Checks if 2 doubles are almost equal
+    private func areAlmostEqual(a: Double, b: Double) -> Bool {
+        return isAlmostZero(value: a - b)
+    }
+
+    /// Checks if 2 points are equal
+    private func pointsAreEqual(p: PathPoint, q: PathPoint) -> Bool {
+        let dx = abs(p.x - q.x)
+        let dy = abs(p.y - q.y)
+        return isAlmostZero(value: dx) && isAlmostZero(value: dy)
+    }
+
+    private struct Delta {
+        var dx: Double
+        var dy: Double
     }
 }

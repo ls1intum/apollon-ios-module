@@ -5,19 +5,19 @@ struct SelectedElementView: View {
     @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var elementMoveStarted: Bool
     @Binding var elementResizeStarted: Bool
-    
+
     @State var isShowingRelationshipConnectionPoints: Bool = false
     @State private var isDrawingLine = false
     @State var isConnectionSelected: Bool = false
     @State var source = UMLRelationshipEndPoint()
     @State var target = UMLRelationshipEndPoint()
-    
+
     // For the drawing path when creating relationship connections
     @State private var startPoint: CGPoint = .zero
     @State private var endPoint: CGPoint = .zero
-    
+
     @State var elementResizeBounds: CGSize = .zero
-    
+
     var body: some View {
         if let bounds = viewModel.selectedElementBounds {
             ZStack {
@@ -27,7 +27,7 @@ struct SelectedElementView: View {
                     .opacity(0.5)
                     .frame(width: bounds.width, height: bounds.height)
                     .position(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2))
-                
+
                 // UP
                 RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, x: bounds.x + (bounds.width / 2), y: bounds.y)
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
@@ -40,7 +40,7 @@ struct SelectedElementView: View {
                                 handleRelationshipDrawEnded(gesture, sourceDirection: .up)
                             }
                     )
-                
+
                 // DOWN
                 RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
@@ -53,7 +53,7 @@ struct SelectedElementView: View {
                                 handleRelationshipDrawEnded(gesture, sourceDirection: .down)
                             }
                     )
-                
+
                 // LEFT
                 RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
@@ -66,7 +66,7 @@ struct SelectedElementView: View {
                                 handleRelationshipDrawEnded(gesture, sourceDirection: .left)
                             }
                     )
-                
+
                 // RIGHT
                 RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
@@ -79,7 +79,7 @@ struct SelectedElementView: View {
                                 handleRelationshipDrawEnded(gesture, sourceDirection: .right)
                             }
                     )
-                
+
                 // Shows the connection points and drawing line when the selected element connection point is hovered
                 if isShowingRelationshipConnectionPoints {
                     DrawingLineView(isDrawing: $isDrawingLine, startPoint: $startPoint, endPoint: $endPoint)
@@ -97,7 +97,7 @@ struct SelectedElementView: View {
                         }
                     }
                 }
-                
+
                 // The button for the moving of the selected element
                 if !elementResizeStarted {
                     MoveSelectedItemButton(viewModel: viewModel)
@@ -119,7 +119,7 @@ struct SelectedElementView: View {
                                 }
                         )
                 }
-                
+
                 // The button for the resizing of the selected element
                 if !elementMoveStarted {
                     if let resizeBy = (viewModel.selectedElement as? UMLElement)?.type?.resizeBy {
@@ -140,7 +140,7 @@ struct SelectedElementView: View {
                             )
                     }
                 }
-                
+
                 // The button for the editing of the selected element
                 if !elementMoveStarted && !elementResizeStarted {
                     EditSelectedItemButton(viewModel: viewModel)
@@ -156,14 +156,14 @@ struct SelectedElementView: View {
             }
         }
     }
-    
+
     private func handleRelationshipDraw(_ gesture: DragGesture.Value, startPointX: CGFloat, startPointY: CGFloat) {
         isShowingRelationshipConnectionPoints = true
         startPoint = CGPoint(x: startPointX, y: startPointY)
         endPoint = gesture.location
         isDrawingLine = true
     }
-    
+
     private func handleRelationshipDrawEnded(_ gesture: DragGesture.Value, sourceDirection: Direction) {
         source.element = viewModel.selectedElement?.id
         source.direction = sourceDirection
@@ -171,17 +171,31 @@ struct SelectedElementView: View {
         isDrawingLine = false
         isShowingRelationshipConnectionPoints = false
     }
-    
+
     private func handleElementResize(_ gesture: DragGesture.Value, resizeBy: ResizeableDirection) {
+        let MIN_SIZE: Double = 100.0
+
+        let newWidth = (viewModel.selectedElement?.bounds?.width ?? 0) + gesture.translation.width
+        let newHeight = (viewModel.selectedElement?.bounds?.height ?? 0) + gesture.translation.height
+
         elementResizeStarted = true
+
         switch resizeBy {
         case .widthAndHeight:
-            elementResizeBounds.width = gesture.translation.width
-            elementResizeBounds.height = gesture.translation.height
+            if newWidth > MIN_SIZE {
+                elementResizeBounds.width = gesture.translation.width
+            }
+            if newHeight > MIN_SIZE {
+                elementResizeBounds.height = gesture.translation.height
+            }
         case .width:
-            elementResizeBounds.width = gesture.translation.width
+            if newWidth > MIN_SIZE {
+                elementResizeBounds.width = gesture.translation.width
+            }
         case .height:
-            elementResizeBounds.height = gesture.translation.height
+            if newHeight > MIN_SIZE {
+                elementResizeBounds.height = gesture.translation.height
+            }
         default:
             return
         }
@@ -198,7 +212,7 @@ struct RelationshipConnectionPoint: View {
     var rotation: Double = 0.0
     let x: Double
     let y: Double
-    
+
     var body: some View {
         Circle()
             .trim(from: trimFrom, to: trimTo)
@@ -216,7 +230,7 @@ struct RelationshipConnectionPoints: View {
     @Binding var target: UMLRelationshipEndPoint
     @Binding var endPoint: CGPoint
     @Binding var isConnectionSelected: Bool
-    
+
     var body: some View {
         if let bounds = element.bounds {
             // UP
@@ -225,21 +239,21 @@ struct RelationshipConnectionPoints: View {
                 .onDisappear() {
                     handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 25, connectionPointY: bounds.y - 25, direction: .up)
                 }
-            
+
             // DOWN
             RelationshipConnectionPoint(color: color, trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
                 .opacity(0.5)
                 .onDisappear() {
                     handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 25, connectionPointY: bounds.y + bounds.height - 25, direction: .down)
                 }
-            
+
             // LEFT
             RelationshipConnectionPoint(color: color, trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
                 .opacity(0.5)
                 .onDisappear() {
                     handleOnDisappear(connectionPointX: bounds.x - 25, connectionPointY: bounds.y + (bounds.height / 2) - 25, direction: .left)
                 }
-            
+
             // RIGHT
             RelationshipConnectionPoint(color: color, trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
                 .opacity(0.5)
@@ -248,7 +262,7 @@ struct RelationshipConnectionPoints: View {
                 }
         }
     }
-    
+
     // This function checks if the endPoint of the new realtionship path is within the bounding box of a connection point of the element and adds it as the target
     private func handleOnDisappear(connectionPointX: CGFloat, connectionPointY: CGFloat, direction: Direction) {
         let rect = CGRect(x: connectionPointX, y: connectionPointY, width: 50, height: 50)
@@ -265,7 +279,7 @@ struct DrawingLineView: View {
     @Binding var isDrawing: Bool
     @Binding var startPoint: CGPoint
     @Binding var endPoint: CGPoint
-    
+
     var body: some View {
         GeometryReader { geometry in
             Path { path in
