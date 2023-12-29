@@ -6,29 +6,30 @@ import ApollonRenderer
 struct ElementEditTopBar: View {
     @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
-    
+
     var body: some View {
         HStack {
             Text("Edit Element")
-                .font(.title)
+                .font(.title2)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             Spacer ()
-            
+
             Button("Done") {
                 isShowingPopup = false
                 viewModel.selectedElement = nil
                 viewModel.adjustDiagramSize()
                 viewModel.updateRelationshipPosition()
-            }.padding(10)
-                .foregroundColor(Color(UIColor.systemBackground))
-                .background(viewModel.themeColor)
-                .cornerRadius(5)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 5)
-                        .stroke(viewModel.themeColor, lineWidth: 1)
-                )
+            }
+            .padding(5)
+            .foregroundColor(Color(UIColor.systemBackground))
+            .background(viewModel.themeColor)
+            .cornerRadius(5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(viewModel.themeColor, lineWidth: 1)
+            )
         }.padding([.leading, .top, .trailing], 15)
     }
 }
@@ -38,7 +39,7 @@ struct ElementNameEditView: View {
     @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     @Binding var elementName: String
-    
+
     var body: some View {
         HStack {
             TextField("Element Name", text: $elementName)
@@ -51,7 +52,7 @@ struct ElementNameEditView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundColor(viewModel.themeColor)
-            }.frame(width: 30, height: 30)
+            }.frame(width: 25, height: 25)
         }.padding([.leading, .trailing], 15)
     }
 }
@@ -59,24 +60,24 @@ struct ElementNameEditView: View {
 // The View, that allows the user to edit or add attributes or methods to the selected element
 struct EditOrAddAttributeOrMethodView: View {
     @ObservedObject var viewModel: ApollonEditViewModel
-    
+
     var title: String
     var childTypeToAdd: UMLElementType
     var attributeType: UMLElementType
     var methodType: UMLElementType
-    
+
     @State var input: String = ""
-    
+
     var children: [UMLElement] {
         guard let childrenSorted = (viewModel.selectedElement as? UMLElement)?.verticallySortedChildren else {
             return []
         }
         return childrenSorted.filter { $0.type == childTypeToAdd }
     }
-    
+
     var body: some View {
         Text(title)
-            .font(.title2)
+            .font(.headline)
             .fontWeight(.bold)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding([.leading, .trailing], 15)
@@ -92,10 +93,10 @@ struct EditOrAddAttributeOrMethodView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundColor(viewModel.themeColor)
-                }.frame(width: 30, height: 30)
+                }.frame(width: 25, height: 25)
             }.padding([.leading, .trailing], 15)
         }
-        
+
         HStack {
             TextField("", text: $input)
                 .textFieldStyle(DottedTextFieldStyle())
@@ -105,7 +106,7 @@ struct EditOrAddAttributeOrMethodView: View {
                 }
         }.padding([.leading, .trailing], 15)
     }
-    
+
     // Creates a binding for the single child element (attribute or method)
     private func bindingForElement(_ element: UMLElement) -> Binding<String> {
         Binding(
@@ -117,7 +118,7 @@ struct EditOrAddAttributeOrMethodView: View {
             }
         )
     }
-    
+
     // This method adds an attribute or method for class and object diagrams to the selected element
     private func addAttributeOrMethod(name: String) {
         guard let elements = viewModel.umlModel.elements, let children = (viewModel.selectedElement as? UMLElement)?.verticallySortedChildren else {
@@ -125,7 +126,7 @@ struct EditOrAddAttributeOrMethodView: View {
             return
         }
         var newBounds: Boundary?
-        
+
         if children.isEmpty {
             if let lastBounds = viewModel.selectedElement?.bounds {
                 if childTypeToAdd == .classAttribute || childTypeToAdd == .classMethod {
@@ -135,10 +136,10 @@ struct EditOrAddAttributeOrMethodView: View {
                 }
             }
         }
-        
+
         let containsAttributes: Bool = children.contains(where: { $0.type == attributeType })
         let containsMethods: Bool = children.contains(where: { $0.type == methodType })
-        
+
         if childTypeToAdd == attributeType && !children.isEmpty {
             if !containsAttributes && containsMethods {
                 if let lastBounds = children.first(where: { $0.type == methodType })?.bounds {
@@ -150,7 +151,7 @@ struct EditOrAddAttributeOrMethodView: View {
                 }
             }
         }
-        
+
         if childTypeToAdd == methodType && !children.isEmpty {
             if !containsMethods && containsAttributes {
                 if let lastBounds = children.last(where: { $0.type == attributeType })?.bounds {
@@ -162,13 +163,13 @@ struct EditOrAddAttributeOrMethodView: View {
                 }
             }
         }
-        
+
         let newChild = UMLElement(name: name, type: childTypeToAdd, owner: viewModel.selectedElement?.id, bounds: newBounds)
         let newItemHeight = (viewModel.selectedElement?.bounds?.height ?? 0) + (newChild.bounds?.height ?? 0)
         viewModel.selectedElement?.bounds?.height = newItemHeight
         (viewModel.selectedElement as? UMLElement)?.addChild(newChild)
         viewModel.umlModel.elements?[newChild.id ?? ""] = newChild
-        
+
         if childTypeToAdd == attributeType && containsMethods {
             if let firstMethodIndex = children.firstIndex(where: { $0.type == methodType }) {
                 for (index, child) in children.enumerated() where index >= firstMethodIndex {
@@ -189,7 +190,7 @@ struct EditDivider: View {
             .frame(height: 1)
             .overlay(Color.primary)
             .padding([.leading, .trailing], 15)
-            .padding([.top, .bottom], 10)
+            .padding([.top, .bottom], 5)
     }
 }
 
@@ -198,7 +199,7 @@ struct PopUpTextFieldStyle: TextFieldStyle {
         configuration
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled(true)
-            .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
+            .padding(5)
             .background(Color(UIColor.systemBackground))
             .cornerRadius(5)
             .overlay(
@@ -213,7 +214,7 @@ struct DottedTextFieldStyle: TextFieldStyle {
         configuration
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled(true)
-            .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
+            .padding(5)
             .background(Color(UIColor.systemBackground))
             .cornerRadius(5)
             .overlay(

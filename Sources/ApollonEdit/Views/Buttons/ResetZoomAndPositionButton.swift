@@ -11,7 +11,7 @@ struct ResetZoomAndPositionButton: View {
         } label: {
             Image(systemName: "scope")
                 .resizable()
-                .frame(width: 30, height: 30)
+                .frame(width: 35, height: 35)
                 .foregroundColor(.white)
                 .padding(5)
                 .background {

@@ -9,9 +9,9 @@ struct ClassDiagramRelationshipEditView: View {
     @Binding var sourceElement: String
     @Binding var targetDirection: Direction
     @Binding var targetElement: String
-    
+
     @State var type: UMLRelationshipType = .classBidirectional
-    
+
     var sourceMultiplicity: Binding<String> {
         Binding(
             get: { (viewModel.selectedElement as? UMLRelationship)?.source?.multiplicity ?? "" },
@@ -22,7 +22,7 @@ struct ClassDiagramRelationshipEditView: View {
             }
         )
     }
-    
+
     var sourceRole: Binding<String> {
         Binding(
             get: { (viewModel.selectedElement as? UMLRelationship)?.source?.role ?? "" },
@@ -33,7 +33,7 @@ struct ClassDiagramRelationshipEditView: View {
             }
         )
     }
-    
+
     var targetMultiplicity: Binding<String> {
         Binding(
             get: { (viewModel.selectedElement as? UMLRelationship)?.target?.multiplicity ?? "" },
@@ -44,7 +44,7 @@ struct ClassDiagramRelationshipEditView: View {
             }
         )
     }
-    
+
     var targetRole: Binding<String> {
         Binding(
             get: { (viewModel.selectedElement as? UMLRelationship)?.target?.role ?? "" },
@@ -55,16 +55,16 @@ struct ClassDiagramRelationshipEditView: View {
             }
         )
     }
-    
+
     var body: some View {
         HStack {
             Text("Association")
-                .font(.title)
+                .font(.title2)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            
+
             Spacer()
-            
+
             Button {
                 if let relationship = (viewModel.selectedElement as? UMLRelationship) {
                     relationship.switchSourceAndTarget()
@@ -75,8 +75,8 @@ struct ClassDiagramRelationshipEditView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundColor(viewModel.themeColor)
-            }.frame(width: 30, height: 30)
-            
+            }.frame(width: 25, height: 25)
+
             Button {
                 viewModel.removeSelectedItem()
                 isShowingPopup = false
@@ -85,25 +85,26 @@ struct ClassDiagramRelationshipEditView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundColor(viewModel.themeColor)
-            }.frame(width: 30, height: 30)
-            
+            }.frame(width: 25, height: 25)
+
             Button("Done") {
                 isShowingPopup = false
                 viewModel.selectedElement = nil
                 viewModel.adjustDiagramSize()
                 viewModel.updateRelationshipPosition()
-            }.padding(10)
-                .foregroundColor(Color(UIColor.systemBackground))
-                .background(viewModel.themeColor)
-                .cornerRadius(5)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 5)
-                        .stroke(viewModel.themeColor, lineWidth: 1)
-                )
+            }
+            .padding(5)
+            .foregroundColor(Color(UIColor.systemBackground))
+            .background(viewModel.themeColor)
+            .cornerRadius(5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(viewModel.themeColor, lineWidth: 1)
+            )
         }.padding([.leading, .top, .trailing], 15)
-        
+
         EditDivider()
-        
+
         // RelationshipType picker
         HStack {
             Menu {
@@ -115,14 +116,14 @@ struct ClassDiagramRelationshipEditView: View {
                 }
             } label: {
                 Text(type.rawValue.replacingOccurrences(of: "Class", with: ""))
-                    .font(.title2)
+                    .font(.headline)
                 Image(systemName: "arrowtriangle.down.fill")
                     .resizable()
                     .tint(viewModel.themeColor)
                     .frame(width: 15, height: 15)
             }.frame(maxWidth: .infinity)
                 .tint(viewModel.themeColor)
-                .padding(10)
+                .padding(5)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
                         .stroke(viewModel.themeColor, lineWidth: 1)
@@ -131,16 +132,16 @@ struct ClassDiagramRelationshipEditView: View {
             .onAppear {
                 type = relationshipType
             }
-        
+
         EditDivider()
-        
+
         // Source Multiplicity and Role Edit
         MultiplicityOrRoleEditView(elementName: viewModel.getElementTypeById(elementId: sourceElement)?.rawValue ?? "",
                                    multiplicityText: sourceMultiplicity,
                                    roleText: sourceRole)
-        
+
         EditDivider()
-        
+
         // Target Multiplicity and Role edit
         MultiplicityOrRoleEditView(elementName: viewModel.getElementTypeById(elementId: targetElement)?.rawValue ?? "",
                                    multiplicityText: targetMultiplicity,
@@ -152,24 +153,24 @@ struct MultiplicityOrRoleEditView: View {
     @State var elementName: String
     @Binding var multiplicityText: String
     @Binding var roleText: String
-    
+
     var body: some View {
         Text(elementName)
-            .font(.title2)
+            .font(.headline)
             .fontWeight(.bold)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding([.leading, .trailing], 15)
-        
+
         HStack {
             Text("Multiplicity")
-                .font(.title2)
+                .font(.subheadline)
             TextField("", text: $multiplicityText)
                 .textFieldStyle(PopUpTextFieldStyle())
         }.padding([.leading, .trailing], 15)
-        
+
         HStack {
             Text("Role")
-                .font(.title2)
+                .font(.subheadline)
             TextField("", text: $roleText)
                 .textFieldStyle(PopUpTextFieldStyle())
         }.padding([.leading, .trailing], 15)

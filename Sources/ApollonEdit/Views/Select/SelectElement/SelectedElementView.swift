@@ -29,7 +29,7 @@ struct SelectedElementView: View {
                     .position(x: bounds.x + (bounds.width / 2), y: bounds.y + (bounds.height / 2))
 
                 // UP
-                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, x: bounds.x + (bounds.width / 2), y: bounds.y)
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, diameter: bounds.width, x: bounds.x + (bounds.width / 2), y: bounds.y)
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -42,7 +42,7 @@ struct SelectedElementView: View {
                     )
 
                 // DOWN
-                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0, trimTo: 0.5, diameter: bounds.width, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -55,7 +55,7 @@ struct SelectedElementView: View {
                     )
 
                 // LEFT
-                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.25, trimTo: 0.75, diameter: bounds.height, x: bounds.x, y: bounds.y + (bounds.height / 2))
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -68,7 +68,7 @@ struct SelectedElementView: View {
                     )
 
                 // RIGHT
-                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
+                RelationshipConnectionPoint(color: viewModel.themeColor, trimFrom: 0.5, trimTo: 1, rotation: 90, diameter: bounds.height, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
                     .opacity(elementMoveStarted || elementResizeStarted ? 0 : 0.5)
                     .gesture(
                         DragGesture()
@@ -101,13 +101,13 @@ struct SelectedElementView: View {
                 // The button for the moving of the selected element
                 if !elementResizeStarted {
                     MoveSelectedItemButton(viewModel: viewModel)
-                        .position(CGPoint(x: bounds.x - 25, y: bounds.y + (bounds.height + 25)))
+                        .position(CGPoint(x: bounds.x - 35, y: bounds.y + (bounds.height + 35)))
                         .gesture(
                             DragGesture()
                                 .onChanged { value in
                                     elementMoveStarted = true
-                                    viewModel.selectedElementBounds?.x = value.location.x + 25
-                                    viewModel.selectedElementBounds?.y = value.location.y - (bounds.height + 25)
+                                    viewModel.selectedElementBounds?.x = value.location.x + 35
+                                    viewModel.selectedElementBounds?.y = value.location.y - (bounds.height + 35)
                                 }
                                 .onEnded { value in
                                     //viewModel.updateElementPosition(location: CGPoint(x: value.location.x + 25, y: value.location.y - (bounds.height + 25)))
@@ -124,7 +124,7 @@ struct SelectedElementView: View {
                 if !elementMoveStarted {
                     if let resizeBy = (viewModel.selectedElement as? UMLElement)?.type?.resizeBy {
                         ResizeSelectedItemButton(viewModel: viewModel, resizeBy: resizeBy)
-                            .position(CGPoint(x: bounds.x + (bounds.width + 25), y: bounds.y + (bounds.height + 25)))
+                            .position(CGPoint(x: bounds.x + (bounds.width + 35), y: bounds.y + (bounds.height + 35)))
                             .gesture(
                                 DragGesture()
                                     .onChanged { value in
@@ -144,7 +144,13 @@ struct SelectedElementView: View {
                 // The button for the editing of the selected element
                 if !elementMoveStarted && !elementResizeStarted {
                     EditSelectedItemButton(viewModel: viewModel)
-                        .position(CGPoint(x: bounds.x + (bounds.width / 2), y: bounds.y - 50))
+                        .position(CGPoint(x: bounds.x - 35, y: bounds.y - 35))
+                }
+
+                // The button for the deletion of the selected element
+                if !elementMoveStarted && !elementResizeStarted {
+                    DeleteSelectedItemButton(viewModel: viewModel)
+                        .position(CGPoint(x: bounds.x + (bounds.width + 35), y: bounds.y - 35))
                 }
             }.onChange(of: isConnectionSelected) {
                 // Adds a new relationship to the model, if a connection point was found
@@ -210,6 +216,7 @@ struct RelationshipConnectionPoint: View {
     let trimFrom: Double
     let trimTo: Double
     var rotation: Double = 0.0
+    var diameter: CGFloat = 100
     let x: Double
     let y: Double
 
@@ -218,7 +225,7 @@ struct RelationshipConnectionPoint: View {
             .trim(from: trimFrom, to: trimTo)
             .rotation(.degrees(rotation))
             .fill(color)
-            .frame(width: 50, height: 50)
+            .frame(width: diameter >= 100 ? 100 : diameter, height: diameter >= 100 ? 100 : diameter)
             .position(x: x, y: y)
     }
 }
@@ -234,38 +241,38 @@ struct RelationshipConnectionPoints: View {
     var body: some View {
         if let bounds = element.bounds {
             // UP
-            RelationshipConnectionPoint(color: color, trimFrom: 0.5, trimTo: 1, x: bounds.x + (bounds.width / 2), y: bounds.y)
+            RelationshipConnectionPoint(color: color, trimFrom: 0.5, trimTo: 1, diameter: bounds.width, x: bounds.x + (bounds.width / 2), y: bounds.y)
                 .opacity(0.5)
                 .onDisappear() {
-                    handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 25, connectionPointY: bounds.y - 25, direction: .up)
+                    handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 50, connectionPointY: bounds.y - 50, direction: .up)
                 }
 
             // DOWN
-            RelationshipConnectionPoint(color: color, trimFrom: 0, trimTo: 0.5, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
+            RelationshipConnectionPoint(color: color, trimFrom: 0, trimTo: 0.5, diameter: bounds.width, x: bounds.x + (bounds.width / 2), y: bounds.y + bounds.height)
                 .opacity(0.5)
                 .onDisappear() {
-                    handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 25, connectionPointY: bounds.y + bounds.height - 25, direction: .down)
+                    handleOnDisappear(connectionPointX: bounds.x + (bounds.width / 2) - 50, connectionPointY: bounds.y + bounds.height - 50, direction: .down)
                 }
 
             // LEFT
-            RelationshipConnectionPoint(color: color, trimFrom: 0.25, trimTo: 0.75, x: bounds.x, y: bounds.y + (bounds.height / 2))
+            RelationshipConnectionPoint(color: color, trimFrom: 0.25, trimTo: 0.75, diameter: bounds.height, x: bounds.x, y: bounds.y + (bounds.height / 2))
                 .opacity(0.5)
                 .onDisappear() {
-                    handleOnDisappear(connectionPointX: bounds.x - 25, connectionPointY: bounds.y + (bounds.height / 2) - 25, direction: .left)
+                    handleOnDisappear(connectionPointX: bounds.x - 50, connectionPointY: bounds.y + (bounds.height / 2) - 50, direction: .left)
                 }
 
             // RIGHT
-            RelationshipConnectionPoint(color: color, trimFrom: 0.5, trimTo: 1, rotation: 90, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
+            RelationshipConnectionPoint(color: color, trimFrom: 0.5, trimTo: 1, rotation: 90, diameter: bounds.height, x: bounds.x + bounds.width, y: bounds.y + (bounds.height / 2))
                 .opacity(0.5)
                 .onDisappear() {
-                    handleOnDisappear(connectionPointX: bounds.x + bounds.width - 25, connectionPointY: bounds.y + (bounds.height / 2) - 25, direction: .right)
+                    handleOnDisappear(connectionPointX: bounds.x + bounds.width - 50, connectionPointY: bounds.y + (bounds.height / 2) - 50, direction: .right)
                 }
         }
     }
 
     // This function checks if the endPoint of the new realtionship path is within the bounding box of a connection point of the element and adds it as the target
     private func handleOnDisappear(connectionPointX: CGFloat, connectionPointY: CGFloat, direction: Direction) {
-        let rect = CGRect(x: connectionPointX, y: connectionPointY, width: 50, height: 50)
+        let rect = CGRect(x: connectionPointX, y: connectionPointY, width: 100, height: 100)
         if rect.contains(endPoint) {
             target.element = element.id ?? ""
             target.direction = direction

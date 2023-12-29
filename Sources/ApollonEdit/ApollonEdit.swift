@@ -24,6 +24,7 @@ public struct ApollonEdit: View {
                 VStack {
                     Spacer()
                     AddElementButton(viewModel: viewModel, isAddElementMenuVisible: $isShowingAddElementMenu)
+                        .padding(5)
                         .popover(isPresented: $isShowingAddElementMenu) {
                             ZStack {
                                 viewModel.themeColor

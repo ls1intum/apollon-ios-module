@@ -2,14 +2,18 @@ import SwiftUI
 
 struct MoveSelectedItemButton: View { 
     @ObservedObject var viewModel: ApollonEditViewModel
+    
     var body: some View {
-        Image(systemName: "arrow.up.and.down.and.arrow.left.and.right")
-            .frame(width: 35, height: 35)
-            .foregroundColor(.white)
-            .padding(5)
-            .background {
-                Circle()
-                    .foregroundColor(viewModel.themeColor)
-            }
+        Group {
+            Image(systemName: "arrow.up.and.down.and.arrow.left.and.right")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 30, height: 30)
+                .foregroundColor(.white)
+                .padding(15)
+                .background(viewModel.themeColor)
+                .clipShape(Circle())
+        }
+        .frame(width: 50, height: 50)
     }
 }

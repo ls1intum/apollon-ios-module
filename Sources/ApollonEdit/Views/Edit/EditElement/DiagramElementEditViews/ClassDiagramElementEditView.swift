@@ -30,7 +30,7 @@ struct ClassDiagramElementEditView: View {
                         (viewModel.selectedElement as? UMLElement)?.type = .abstractClass
                     }
                 }) {
-                    Text("Abstract").padding(10)
+                    Text("Abstract").padding(5)
                 }.buttonStyle(RoundedButtonStyle(selected: selectedButton == 0 || (viewModel.selectedElement as? UMLElement)?.type == .abstractClass, color: viewModel.themeColor))
 
                 Spacer()
@@ -45,7 +45,7 @@ struct ClassDiagramElementEditView: View {
                         
                     }
                 }) {
-                    Text("Interface").padding(10)
+                    Text("Interface").padding(5)
                 }.buttonStyle(RoundedButtonStyle(selected: selectedButton == 1 || (viewModel.selectedElement as? UMLElement)?.type == .interface, color: viewModel.themeColor))
 
                 Spacer()
@@ -59,7 +59,7 @@ struct ClassDiagramElementEditView: View {
                         (viewModel.selectedElement as? UMLElement)?.type = .enumeration
                     }
                 }) {
-                    Text("Enumeration").padding(10)
+                    Text("Enumeration").padding(5)
                 }
                 .buttonStyle(RoundedButtonStyle(selected: selectedButton == 2 || (viewModel.selectedElement as? UMLElement)?.type == .enumeration, color: viewModel.themeColor))
             }
@@ -69,7 +69,7 @@ struct ClassDiagramElementEditView: View {
             EditDivider()
             
             EditOrAddAttributeOrMethodView(viewModel: viewModel,
-                                     title: "Atributes",
+                                     title: "Attributes",
                                      childTypeToAdd: .classAttribute,
                                      attributeType: .classAttribute,
                                      methodType: .classMethod)
