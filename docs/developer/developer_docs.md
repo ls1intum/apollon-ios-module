@@ -1,4 +1,4 @@
-# Apollon iOS Module Developer Docs
+# Apollon iOS Module Developer Documentation
 
 ## Overview
 
@@ -9,7 +9,7 @@
 
 ## Architecture
 
-![Subsystem decomposition of the Apollon-iOS-Module](./images/subsystem_decomposition.png)
+![Subsystem decomposition of the Apollon-iOS-Module](../images/subsystem_decomposition.png)
 
 *Figure: Subsystem decomposition of the `Apollon-iOS-Module`.*
 
@@ -40,9 +40,9 @@ ApollonView(umlModel: UMLModel,
             @ViewBuilder content: () -> Content)
 ```
 
-## Adding a New Diagram Type
+## Adding a new Diagram Type
 
-In this section, we will look at how you can add a new diagram type. For this, we will go through each module of the package and discuss what needs to be added.
+In this section, we will look at how you can add a new diagram type. For this, we will go through each module of the package and discuss what needs to be added or modified.
 
 ### `ApollonView`
 
@@ -50,7 +50,7 @@ In this module, nothing has to be added or changed in regard to adding a new dia
 
 ### `ApollonShared`
 
-In this module, we focus on the Data and DataModels.
+In this module, we focus on the data and `DataModels`.
 
 - `DataModels/Types/UMLElementType.swift`: 
     1. Add all the different element types as cases to the `UMLElementType` enum, that your new diagram type can use. 
@@ -69,26 +69,26 @@ In this module, we focus on the Data and DataModels.
 
 ### `ApollonRenderer`
 
-In this module, we focus on the rendering of the new diagram type
+In this module, we focus on the rendering part of the new diagram type.
 
 - `DiagramRenderers`: 
     1. Create a new folder in this directory and name it after your diagram type.
     
 - `DiagramRenderers/<DiagramType>`:
-    1. Create 3 new files in this directory and name them `<DiagramType>Renderer.swift`, `<DiagramType>ElementRenderer.swift` and `<DiagramType>RelationshipRenderer.swift`.
+    1. Create three new files in this directory and name them `<DiagramType>Renderer.swift`, `<DiagramType>ElementRenderer.swift`, and `<DiagramType>RelationshipRenderer.swift`.
 
 - `DiagramRenderers/<DiagramType>/<DiagramType>ElementRenderer.swift`:
     1. Create a struct named after the file name that extends the `UMLDiagramRenderer`.
     2. Create a public `render(umlModel: UMLModel)` function, that initiates the element rendering process.
-    3. Follow the structure of other diagram types element rendering process and create your specific element rendering process.
+    3. Follow the structure of other diagram types' element rendering process and create your specific element rendering process.
 
 - `DiagramRenderers/<DiagramType>/<DiagramType>RelationshipRenderer.swift`:
     1. Create a struct named after the file name that extends the `UMLDiagramRenderer`.
     2. Create a public `render(umlModel: UMLModel)` function, that initiates the relationship rendering process.
-    3. Follow the structure of other diagram types relationship rendering process and create your specific relationship rendering process.
+    3. Follow the structure of other diagram types' relationship rendering process and create your specific relationship rendering process.
     
 - `DiagramRenderers/<DiagramType>/<DiagramType>Renderer.swift`:
-    1. Add the following code and change the <DiagramType> placeholder:
+    1. Add the following code and change the `<DiagramType>` placeholder:
     ```swift
     import SwiftUI
     import ApollonShared
@@ -112,15 +112,15 @@ In this module, we focus on the rendering of the new diagram type
     ```
 
 - `DiagramRenderers/UMLDiagramRenderer.swift`:
-    1. Add your <DiagramType> as a case to the `UMLDiagramRendererFactory` enum and return your `<DiagramType>Renderer` struct.
+    1. Add your diagram type as a case to the `UMLDiagramRendererFactory` enum and return your `<DiagramType>Renderer` struct.
 
 ### `ApollonEdit`
 
 In this module, we focus on the editing and interaction of the new diagram type and its elements and relationships.
 
 - `Resources/Assets/ElementIcons`:
-    1. Create a folder and name it after your <DiagramType>.
-    2. Add all the images of your elements to this folder and name them exactly how you did in the `UMLElementType.swift` file. These images are shown to a user that would like to add a new element to the canvas. 
+    1. Create a folder and name it after your diagram type.
+    2. Add all the images of your elements to this folder and name them exactly how you did in the `UMLElementType.swift` file. These images are shown to a user who would like to add a new element to the canvas. 
 
 - `Views/CreateElement/ElementCreator.swift`:
     1. Create a new struct in this file and name it `<ElementType>Creator` for each element type you want to add. Make sure each struct implements the `ElementCreator` protocol.
