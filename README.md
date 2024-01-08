@@ -1,4 +1,4 @@
-# Apollon-iOS-Module
+# Apollon iOS Module
 
 Apollon-iOS-Module is a SPM package containing different modules, which allow for creating, editing, and viewing UML diagrams across all Artemis-related iOS apps. This package is based on [Apollon](https://github.com/ls1intum/Apollon).
 
@@ -21,7 +21,7 @@ This package will be integrated into the following clients:
 
 ## Architecture
 
-![Subsystem decomposition of the Apollon-iOS-Module](Documentation/Apollon-iOS-Module-SUBSYSTEM.png)
+![Subsystem decomposition of the Apollon-iOS-Module](docs/images/subsystem_decomposition.png)
 
 *Figure: Subsystem decomposition of the `Apollon-iOS-Module`.*
 
