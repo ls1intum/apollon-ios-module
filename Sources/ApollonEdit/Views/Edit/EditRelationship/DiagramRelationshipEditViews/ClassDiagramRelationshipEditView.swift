@@ -5,9 +5,7 @@ struct ClassDiagramRelationshipEditView: View {
     @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
     @Binding var relationshipType: UMLRelationshipType
-    @Binding var sourceDirection: Direction
     @Binding var sourceElement: String
-    @Binding var targetDirection: Direction
     @Binding var targetElement: String
 
     @State var type: UMLRelationshipType = .classBidirectional

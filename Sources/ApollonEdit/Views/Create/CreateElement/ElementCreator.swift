@@ -24,6 +24,10 @@ enum ElementCreatorFactory {
             return UseCaseCreator()
         case .useCaseSystem:
             return UseCaseSystemCreator()
+        case .component, .componentSubsystem:
+            return ComponentOrSubsystemCreator()
+        case .componentInterface:
+            return ComponentInterfaceCreator()
         default:
             return nil
         }
@@ -99,5 +103,17 @@ struct UseCaseCreator: ElementCreator {
 struct UseCaseSystemCreator: ElementCreator {
     func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
         return [UMLElement(name: "System", type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 100))]
+    }
+}
+
+struct ComponentOrSubsystemCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 100))]
+    }
+}
+
+struct ComponentInterfaceCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(name: "Interface", type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 20, height: 20))]
     }
 }

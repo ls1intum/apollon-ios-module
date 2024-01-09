@@ -1,40 +1,33 @@
 import SwiftUI
 import ApollonShared
 
-struct UseCaseDiagramRelationshipEditView: View {
+struct ComponentDiagramRelationshipEditView: View {
     @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
-    @Binding var relationshipName: String
     @Binding var relationshipType: UMLRelationshipType
 
-    @State var type: UMLRelationshipType = .useCaseAssociation
+    @State var type: UMLRelationshipType = .componentDependency
 
     var body: some View {
         HStack {
-            Text(type.rawValue.replacingOccurrences(of: "UseCase", with: ""))
+            Text("Association")
                 .font(.title2)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 
-            if type != .useCaseAssociation {
-                Button {
-                    if let relationship = (viewModel.selectedElement as? UMLRelationship) {
-                        relationship.switchSourceAndTarget()
-                        viewModel.updateRelationshipPosition()
-                    }
-                } label: {
-                    Image(systemName: "arrow.left.arrow.right")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .foregroundColor(viewModel.themeColor)
+            Button {
+                if let relationship = (viewModel.selectedElement as? UMLRelationship) {
+                    relationship.switchSourceAndTarget()
+                    viewModel.updateRelationshipPosition()
                 }
-                .frame(width: 25, height: 25)
-                .onAppear() {
-                    relationshipName = ""
-                }
-            }
+            } label: {
+                Image(systemName: "arrow.left.arrow.right")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundColor(viewModel.themeColor)
+            }.frame(width: 25, height: 25)
 
             Button {
                 viewModel.removeSelectedItem()
@@ -67,14 +60,14 @@ struct UseCaseDiagramRelationshipEditView: View {
         // RelationshipType picker
         HStack {
             Menu {
-                ForEach(UMLDiagramType.useCaseDiagram.diagramRelationshipTypes, id: \.self) { relationship in
-                    Button(relationship.rawValue.replacingOccurrences(of: "UseCase", with: "")) {
+                ForEach(UMLDiagramType.componentDiagram.diagramRelationshipTypes, id: \.self) { relationship in
+                    Button(relationship.rawValue.replacingOccurrences(of: "Component", with: "")) {
                         relationshipType = relationship
                         type = relationship
                     }
                 }
             } label: {
-                Text(type.rawValue.replacingOccurrences(of: "UseCase", with: ""))
+                Text(type.rawValue.replacingOccurrences(of: "Component", with: ""))
                     .font(.headline)
                 Image(systemName: "arrowtriangle.down.fill")
                     .resizable()
@@ -91,13 +84,5 @@ struct UseCaseDiagramRelationshipEditView: View {
             .onAppear {
                 type = relationshipType
             }
-
-        if type == .useCaseAssociation {
-            EditDivider()
-
-            TextField("...", text: $relationshipName)
-                .textFieldStyle(PopUpTextFieldStyle())
-                .padding([.leading, .trailing], 15)
-        }
     }
 }

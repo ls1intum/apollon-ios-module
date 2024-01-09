@@ -44,6 +44,10 @@ struct ElementEditPopUpView: View {
                 CommunicationDiagramElementEditView(viewModel: viewModel,
                                                     isShowingPopup: $isShowingPopup,
                                                     elementName: elementName)
+            } else if (viewModel.diagramType == .componentDiagram) {
+                ComponentDiagramElementEditView(viewModel: viewModel,
+                                                    isShowingPopup: $isShowingPopup,
+                                                    elementName: elementName)
             } else {
                 EmptyView()
             }

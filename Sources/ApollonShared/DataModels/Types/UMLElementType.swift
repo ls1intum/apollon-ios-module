@@ -18,6 +18,7 @@ public enum UMLElementType: String, Codable {
     case deploymentArtifact = "DeploymentArtifact"
     case deploymentInterface = "DeploymentInterface"
     case component = "Component"
+    case componentSubsystem = "Subsystem"
     case componentInterface = "ComponentInterface"
     case communicationLinkMessage = "CommunicationLinkMessage"
     case useCase = "UseCase"
@@ -52,6 +53,10 @@ public enum UMLElementType: String, Codable {
             return "<<enumeration>>"
         case .abstractClass:
             return "<<abstract>>"
+        case .component:
+            return "<<component>>"
+        case .componentSubsystem:
+            return "<<subsystem>>"
         default:
             return ""
         }
@@ -69,7 +74,7 @@ public enum UMLElementType: String, Codable {
 
     public var isContainer: Bool {
         switch self {
-        case .package, .useCaseSystem:
+        case .package, .useCaseSystem, .component, .componentSubsystem:
             return true
         default:
             return false
@@ -79,7 +84,7 @@ public enum UMLElementType: String, Codable {
     /// The direction to which the element is resizable
     public var resizeBy: ResizeableDirection {
         switch self {
-        case .package, .activityObjectNode, .activityMergeNode, .activityActionNode, .activity, .useCaseSystem, .useCase, .component:
+        case .package, .activityObjectNode, .activityMergeNode, .activityActionNode, .activity, .useCaseSystem, .useCase, .component, .componentSubsystem:
             return .widthAndHeight
         case .enumeration, .interface, .abstractClass, .Class, .objectName, .activityForkNodeHorizontal:
             return .width

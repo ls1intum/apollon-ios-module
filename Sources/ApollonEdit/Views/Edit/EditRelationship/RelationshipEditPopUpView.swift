@@ -27,17 +27,6 @@ struct RelationshipEditPopUpView: View {
         )
     }
     
-    var sourceDirection: Binding<Direction> {
-        Binding(
-            get: { (viewModel.selectedElement as? UMLRelationship)?.source?.direction ?? .down },
-            set: { newDirection in
-                if let relationship = viewModel.selectedElement as? UMLRelationship {
-                    relationship.source?.direction = newDirection
-                }
-            }
-        )
-    }
-    
     var sourceElement: Binding<String> {
         Binding(
             get: { (viewModel.selectedElement as? UMLRelationship)?.source?.element ?? "" },
@@ -48,18 +37,7 @@ struct RelationshipEditPopUpView: View {
             }
         )
     }
-    
-    var targetDirection: Binding<Direction> {
-        Binding(
-            get: { (viewModel.selectedElement as? UMLRelationship)?.target?.direction ?? .down },
-            set: { newDirection in
-                if let relationship = viewModel.selectedElement as? UMLRelationship {
-                    relationship.target?.direction = newDirection
-                }
-            }
-        )
-    }
-    
+
     var targetElement: Binding<String> {
         Binding(
             get: { (viewModel.selectedElement as? UMLRelationship)?.target?.element ?? "" },
@@ -77,9 +55,7 @@ struct RelationshipEditPopUpView: View {
                 ClassDiagramRelationshipEditView(viewModel: viewModel,
                                                  isShowingPopup: $isShowingPopup,
                                                  relationshipType: relationshipType,
-                                                 sourceDirection: sourceDirection,
                                                  sourceElement: sourceElement,
-                                                 targetDirection: targetDirection,
                                                  targetElement: targetElement)
             } else if (viewModel.diagramType == .objectDiagram) {
                 ObjectDiagramRelationshipEditView(viewModel: viewModel,
@@ -88,16 +64,16 @@ struct RelationshipEditPopUpView: View {
                 UseCaseDiagramRelationshipEditView(viewModel: viewModel,
                                                    isShowingPopup: $isShowingPopup,
                                                    relationshipName: relationshipName,
-                                                   relationshipType: relationshipType,
-                                                   sourceDirection: sourceDirection,
-                                                   sourceElement: sourceElement,
-                                                   targetDirection: targetDirection,
-                                                   targetElement: targetElement)
+                                                   relationshipType: relationshipType)
             } else if (viewModel.diagramType == .communicationDiagram) {
                 CommunicationDiagramRelationshipEditView(viewModel: viewModel,
                                                          isShowingPopup: $isShowingPopup,
                                                          sourceElement: sourceElement,
                                                          targetElement: targetElement)
+            } else if (viewModel.diagramType == .componentDiagram) {
+                ComponentDiagramRelationshipEditView(viewModel: viewModel,
+                                                     isShowingPopup: $isShowingPopup,
+                                                     relationshipType: relationshipType)
             } else {
                 EmptyView()
             }

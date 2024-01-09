@@ -62,7 +62,7 @@ In this module, we focus on the data and `DataModels`.
 - `DataModels/Types/UMLDiagramType.swift`: 
     1. Add a new case to the `UMLDiagramType` enum with the name of your new diagram type. 
     2. Add a new case to the `diagramElementTypes` variable with your diagram type name and return the applicable element types.
-    3. Add a new case to the `diagramRelationshipTypes` variable with your diagram type name and return the applicable relationship types.
+    3. Add a new case to the `diagramRelationshipTypes` variable with your diagram type name and return the applicable relationship types. (The first relationship type in each array will be the default relationship when drawing a new relationship)
     4. Add your diagram type to the `isDiagramTypeUnsupported()` function, as a false case, to enable the use of the diagram type (It is recommended to do this step after finishing all other steps that follow, as completing this step will make the diagram 'go live').
     
 - Get familiar with all the other DataModels and adjust them only if needed. If adjusting, please make sure to adhere to the Apollon data format.

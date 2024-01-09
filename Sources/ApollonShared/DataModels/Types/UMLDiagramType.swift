@@ -28,7 +28,7 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
         case .communicationDiagram:
             return [.objectName]
         case .componentDiagram:
-            return [.componentInterface, .component]
+            return [.component, .componentSubsystem, .componentInterface]
         case .deploymentDiagram:
             return [.deploymentInterface, .deploymentArtifact, .deploymentComponent, .deploymentNode]
         case .petriNet:
@@ -75,7 +75,7 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
     // Soon: Communication Diagram
     public static func isDiagramTypeUnsupported(diagramType: UMLDiagramType) -> Bool {
         switch diagramType {
-        case .classDiagram, .objectDiagram, .useCaseDiagram:
+        case .classDiagram, .objectDiagram, .useCaseDiagram, .componentDiagram:
             return false
         default:
             return true
