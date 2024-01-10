@@ -4,7 +4,7 @@ import ApollonShared
 struct ElementEditPopUpView: View {
     @ObservedObject var viewModel: ApollonEditViewModel
     @Binding var isShowingPopup: Bool
-    
+
     var elementName: Binding<String> {
         Binding(
             get: { viewModel.selectedElement?.name ?? "" },
@@ -13,7 +13,7 @@ struct ElementEditPopUpView: View {
             }
         )
     }
-    
+
     var elementType: Binding<UMLElementType> {
         Binding(
             get: { (viewModel.selectedElement as? UMLElement)?.type ?? .Class},
@@ -24,11 +24,11 @@ struct ElementEditPopUpView: View {
             }
         )
     }
-    
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             if(viewModel.diagramType == .classDiagram) {
-                ClassDiagramElementEditView(viewModel: viewModel, 
+                ClassDiagramElementEditView(viewModel: viewModel,
                                             isShowingPopup: $isShowingPopup,
                                             elementName: elementName,
                                             elementType: elementType)
@@ -36,6 +36,11 @@ struct ElementEditPopUpView: View {
                 ObjectDiagramElementEditView(viewModel: viewModel,
                                              isShowingPopup: $isShowingPopup,
                                              elementName: elementName)
+            } else if (viewModel.diagramType == .activityDiagram) {
+                ActivityDiagramElementEditView(viewModel: viewModel,
+                                               isShowingPopup: $isShowingPopup,
+                                               elementName: elementName,
+                                               elementType: elementType)
             } else if (viewModel.diagramType == .useCaseDiagram) {
                 UseCaseDiagramElementEditView(viewModel: viewModel,
                                               isShowingPopup: $isShowingPopup,
@@ -46,8 +51,8 @@ struct ElementEditPopUpView: View {
                                                     elementName: elementName)
             } else if (viewModel.diagramType == .componentDiagram) {
                 ComponentDiagramElementEditView(viewModel: viewModel,
-                                                    isShowingPopup: $isShowingPopup,
-                                                    elementName: elementName)
+                                                isShowingPopup: $isShowingPopup,
+                                                elementName: elementName)
             } else {
                 EmptyView()
             }

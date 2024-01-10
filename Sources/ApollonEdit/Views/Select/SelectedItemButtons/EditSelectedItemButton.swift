@@ -4,6 +4,7 @@ import ApollonShared
 struct EditSelectedItemButton: View {
     @ObservedObject var viewModel: ApollonEditViewModel
     @State private var isShowingPopup: Bool = false
+    var isElementNotEditable: Bool = false
 
     var body: some View {
         Button {
@@ -15,9 +16,10 @@ struct EditSelectedItemButton: View {
                 .frame(width: 30, height: 30)
                 .foregroundColor(.white)
                 .padding(15)
-                .background(viewModel.themeColor)
+                .background(isElementNotEditable == true ? .gray : viewModel.themeColor)
                 .clipShape(Circle())
         }
+        .disabled(isElementNotEditable == true)
         .frame(width: 50, height: 50)
         .sheet(isPresented: $isShowingPopup, onDismiss: {
             viewModel.adjustDiagramSize()

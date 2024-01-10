@@ -22,7 +22,7 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
         case .objectDiagram:
             return [.objectName]
         case .activityDiagram:
-            return [.activityForkNodeHorizontal, .activityForkNode, .activityMergeNode, .activityObjectNode, .activityActionNode, .activityFinalNode, .activityInitialNode, .activity]
+            return [.activity, .activityInitialNode, .activityFinalNode, .activityActionNode, .activityObjectNode, .activityMergeNode, .activityForkNode, .activityForkNodeHorizontal]
         case .useCaseDiagram:
             return [.useCaseActor, .useCase, .useCaseSystem]
         case .communicationDiagram:
@@ -75,7 +75,7 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
     // Soon: Communication Diagram
     public static func isDiagramTypeUnsupported(diagramType: UMLDiagramType) -> Bool {
         switch diagramType {
-        case .classDiagram, .objectDiagram, .useCaseDiagram, .componentDiagram:
+        case .classDiagram, .objectDiagram, .useCaseDiagram, .activityDiagram, .componentDiagram:
             return false
         default:
             return true

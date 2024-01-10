@@ -43,7 +43,7 @@ public enum UMLElementType: String, Codable {
     case enumeration = "Enumeration"
     case classAttribute = "ClassAttribute"
     case classMethod = "ClassMethod"
-    
+
     /// The string that should be shown on the UML elements to indicate the type of the element
     public var annotationTitle: String {
         switch self {
@@ -72,9 +72,20 @@ public enum UMLElementType: String, Codable {
         }
     }
 
+    /// Checks if the Element can be edited
+    public var isElementNotEditable: Bool {
+        switch self {
+        case .activityInitialNode, .activityFinalNode, .activityForkNode, .activityForkNodeHorizontal:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Checks if the Element can act as a container
     public var isContainer: Bool {
         switch self {
-        case .package, .useCaseSystem, .component, .componentSubsystem:
+        case .package, .useCaseSystem, .component, .componentSubsystem, .activity:
             return true
         default:
             return false

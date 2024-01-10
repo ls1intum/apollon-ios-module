@@ -7,18 +7,24 @@ struct CommunicationDiagramRelationshipEditView: View {
     @Binding var isShowingPopup: Bool
     @Binding var sourceElement: String
     @Binding var targetElement: String
-    
+
+    var messages: [UMLElement] {
+        guard let messagesSorted = (viewModel.selectedElement as? UMLRelationship)?.messages else {
+            return []
+        }
+        return messagesSorted.values.filter { $0.type == .communicationLinkMessage }
+    }
+
     var body: some View {
         HStack {
             Text("Communication Link")
-                .font(.title)
+                .font(.title2)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .minimumScaleFactor(0.5)
                 .lineLimit(1)
-            
+
             Spacer()
-            
+
             Button {
                 viewModel.removeSelectedItem()
                 isShowingPopup = false
@@ -27,85 +33,91 @@ struct CommunicationDiagramRelationshipEditView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundColor(viewModel.themeColor)
-            }.frame(width: 30, height: 30)
-            
+            }.frame(width: 25, height: 25)
+
             Button("Done") {
                 isShowingPopup = false
                 viewModel.selectedElement = nil
                 viewModel.adjustDiagramSize()
                 viewModel.updateRelationshipPosition()
-            }.padding(10)
-                .foregroundColor(Color(UIColor.systemBackground))
-                .background(viewModel.themeColor)
-                .cornerRadius(5)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 5)
-                        .stroke(viewModel.themeColor, lineWidth: 1)
-                )
+            }
+            .padding(5)
+            .foregroundColor(Color(UIColor.systemBackground))
+            .background(viewModel.themeColor)
+            .cornerRadius(5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(viewModel.themeColor, lineWidth: 1)
+            )
         }.padding([.leading, .top, .trailing], 15)
-        
+
         EditDivider()
-        
+
         Text("Messages (\(viewModel.getElementById(elementId: sourceElement)?.name ?? "") ⟶ \(viewModel.getElementById(elementId: targetElement)?.name ?? ""))")
-            .font(.title)
+            .font(.title3)
             .fontWeight(.bold)
             .frame(maxWidth: .infinity, alignment: .leading)
             .minimumScaleFactor(0.5)
-            .lineLimit(1)
+            .lineLimit(2)
             .padding([.leading, .trailing], 15)
-        
+
         if let relationship = viewModel.selectedElement as? UMLRelationship {
-            EditOrAddLinkMessage(viewModel: viewModel, parentRelationship: relationship, messages: relationship.messages ?? [:])
+            EditOrAddLinkMessage(viewModel: viewModel, parentRelationship: relationship, messages: messages)
         }
     }
 }
 
 // The View, that allows the user to edit or add a link message of the selected relationship
-// TODO: FINISH THE FUNCTION (NOT FULLY FUNCTIONAL YET)
 struct EditOrAddLinkMessage: View {
-    @StateObject var viewModel: ApollonEditViewModel
+    @ObservedObject var viewModel: ApollonEditViewModel
     @State var parentRelationship: UMLRelationship
-    @State var messages: [String : UMLElement]
-    
+    @State var messages: [UMLElement]
+
     @State var input: String = ""
-    
+
+    // Hacky way to force update the view
+    @State private var forceUpdate = false
+
     var body: some View {
-        Text("To fix")
-//        ForEach(messages, id: \.id) { message in
-//            HStack {
-//                TextField("Name", text: bindingForMessage(message))
-//                    .textFieldStyle(PopUpTextFieldStyle())
-//                
-//                Button {
-//                    changeMessageDirection(message: message)
-//                } label: {
-//                    Image(systemName: message.direction == .source ? "arrow.right" : "arrow.left")
-//                        .resizable()
-//                        .aspectRatio(contentMode: .fit)
-//                        .foregroundColor(Color.blue)
-//                }.frame(width: 30, height: 30)
-//                
-//                Button {
-//                    parentRelationship.messages?.removeAll { $0.id == message.id }
-//                } label: {
-//                    Image(systemName: "trash")
-//                        .resizable()
-//                        .aspectRatio(contentMode: .fit)
-//                        .foregroundColor(Color.blue)
-//                }.frame(width: 30, height: 30)
-//            }.padding([.leading, .trailing], 15)
-//        }
-//        
-//        HStack {
-//            TextField("", text: $input)
-//                .textFieldStyle(DottedTextFieldStyle())
-//                .onSubmit {
-//                    addMessage(name: input)
-//                    input = ""
-//                }
-//        }.padding([.leading, .trailing], 15)
+        ForEach($messages, id: \.id) { message in
+            HStack {
+                TextField("Name", text: bindingForMessage(message.wrappedValue))
+                    .textFieldStyle(PopUpTextFieldStyle())
+
+                Button {
+                    changeMessageDirection(message: message.wrappedValue)
+                } label: {
+                    Image(systemName: message.direction.wrappedValue == .source ? "arrow.right" : "arrow.left")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(viewModel.themeColor)
+                }
+                .frame(width: 25, height: 25)
+                .id(forceUpdate)
+
+                Button {
+                    removeMessage(message: message.wrappedValue)
+                } label: {
+                    Image(systemName: "trash")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(viewModel.themeColor)
+                }.frame(width: 25, height: 25)
+            }
+            .padding([.leading, .trailing], 15)
+        }
+
+        HStack {
+            TextField("", text: $input)
+                .textFieldStyle(DottedTextFieldStyle())
+                .onSubmit {
+                    addMessage(name: input)
+                    input = ""
+                }
+        }
+        .padding([.leading, .trailing], 15)
     }
-    
+
     // Creates a binding for the single child element (attribute or method)
     private func bindingForMessage(_ message: UMLElement) -> Binding<String> {
         Binding(
@@ -119,17 +131,31 @@ struct EditOrAddLinkMessage: View {
             }
         )
     }
+
     private func changeMessageDirection(message: UMLElement) {
-        message.direction = message.direction?.inverted
+        let newDirection: ElementDirection = message.direction == .source ? .target : .source
+        parentRelationship.messages?[message.id ?? ""]?.direction = newDirection
+        messages.first(where: { $0.id == message.id })?.direction = newDirection
+        self.forceUpdate.toggle()
     }
-    
-    // This method adds an attribute or method for class and object diagrams to the selected element
-    // TODO: FINISH THE FUNCTION
+
+    // This method adds a new message to the selected relationship
     private func addMessage(name: String) {
-//        guard let elements = viewModel.umlModel?.elements, let children = (viewModel.selectedElement as? UMLElement)?.verticallySortedChildren else {
-//            log.warning("Could not find elements in the model")
-//            return
-//        }
-//        var newBounds: Boundary?
+        if parentRelationship.messages == nil {
+            parentRelationship.messages = [String: UMLElement]()
+            let newMessage = UMLElement(name: name, type: .communicationLinkMessage, bounds: Boundary(x: 0, y: 0, width: 20, height: 18.5), direction: .source)
+            parentRelationship.messages?[newMessage.id ?? ""] = newMessage
+            messages.append(newMessage)
+        } else {
+            let newMessage = UMLElement(name: name, type: .communicationLinkMessage, bounds: Boundary(x: 0, y: 0, width: 20, height: 18.5), direction: .source)
+            parentRelationship.messages?[newMessage.id ?? ""] = newMessage
+            messages.append(newMessage)
+        }
+    }
+
+    // Removes a message from the selected Element
+    private func removeMessage(message: UMLElement) {
+        parentRelationship.messages?.removeValue(forKey: message.id ?? "")
+        messages.removeAll(where: { $0.id == message.id })
     }
 }

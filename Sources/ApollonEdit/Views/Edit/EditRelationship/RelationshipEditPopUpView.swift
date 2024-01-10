@@ -60,6 +60,10 @@ struct RelationshipEditPopUpView: View {
             } else if (viewModel.diagramType == .objectDiagram) {
                 ObjectDiagramRelationshipEditView(viewModel: viewModel,
                                                   isShowingPopup: $isShowingPopup)
+            } else if (viewModel.diagramType == .activityDiagram) {
+                ActivityDiagramRelationshipEditView(viewModel: viewModel,
+                                                   isShowingPopup: $isShowingPopup,
+                                                   relationshipName: relationshipName)
             } else if (viewModel.diagramType == .useCaseDiagram) {
                 UseCaseDiagramRelationshipEditView(viewModel: viewModel,
                                                    isShowingPopup: $isShowingPopup,

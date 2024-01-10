@@ -16,4 +16,3 @@ struct SelectedRelationshipView: View {
         }
     }
 }
-

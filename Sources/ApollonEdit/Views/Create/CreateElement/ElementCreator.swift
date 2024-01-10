@@ -18,6 +18,20 @@ enum ElementCreatorFactory {
             return PackageCreator()
         case .objectName:
             return ObjectCreator()
+        case .activity:
+            return ActivityCreator()
+        case .activityInitialNode, .activityFinalNode:
+            return ActivityInitialOrFinalNodeCreator()
+        case .activityActionNode:
+            return ActivityActionNodeCreator()
+        case .activityObjectNode:
+            return ActivityObjectNodeCreator()
+        case .activityMergeNode:
+            return ActivityMergeNodeCreator()
+        case .activityForkNode:
+            return ActivityForkNodeCreator()
+        case .activityForkNodeHorizontal:
+            return ActivityForkNodeHorizontalCreator()
         case .useCaseActor:
             return UseCaseActorCreator()
         case .useCase:
@@ -85,6 +99,48 @@ struct ObjectCreator: ElementCreator {
 struct PackageCreator: ElementCreator {
     func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
         return [UMLElement(type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 100))]
+    }
+}
+
+struct ActivityCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement( type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 100))]
+    }
+}
+
+struct ActivityInitialOrFinalNodeCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 45, height: 45))]
+    }
+}
+
+struct ActivityActionNodeCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(name: "Action", type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 100))]
+    }
+}
+
+struct ActivityObjectNodeCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(name: "Object", type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 100))]
+    }
+}
+
+struct ActivityMergeNodeCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(name: "Condition", type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 200, height: 100))]
+    }
+}
+
+struct ActivityForkNodeCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 20, height: 60))]
+    }
+}
+
+struct ActivityForkNodeHorizontalCreator: ElementCreator {
+    func createAllElements(for type: UMLElementType, middle: CGPoint) -> [UMLElement] {
+        return [UMLElement(type: type, bounds: Boundary(x: middle.x, y: middle.y, width: 60, height: 20))]
     }
 }
 

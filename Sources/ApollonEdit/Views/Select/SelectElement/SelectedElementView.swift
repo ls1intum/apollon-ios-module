@@ -143,8 +143,10 @@ struct SelectedElementView: View {
 
                 // The button for the editing of the selected element
                 if !elementMoveStarted && !elementResizeStarted {
-                    EditSelectedItemButton(viewModel: viewModel)
-                        .position(CGPoint(x: bounds.x - 35, y: bounds.y - 35))
+                    if let isElementNotEditable = (viewModel.selectedElement as? UMLElement)?.type?.isElementNotEditable {
+                        EditSelectedItemButton(viewModel: viewModel, isElementNotEditable: isElementNotEditable)
+                            .position(CGPoint(x: bounds.x - 35, y: bounds.y - 35))
+                    }
                 }
 
                 // The button for the deletion of the selected element
