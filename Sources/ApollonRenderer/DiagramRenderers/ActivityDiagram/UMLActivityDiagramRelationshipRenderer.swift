@@ -37,7 +37,7 @@ struct UMLActivityDiagramRelationshipRenderer: UMLDiagramRenderer {
         }
         
         context.stroke(path, with: .color(Color.primary))
-        drawControlFlowTitleText(for: relationship, on: path)
+        drawControlFlowTitleText(for: relationship)
         drawControlFlowHead(for: relationship, on: path)
     }
     
@@ -45,7 +45,7 @@ struct UMLActivityDiagramRelationshipRenderer: UMLDiagramRenderer {
         drawControlFlow(relationship, in: relationshipRect)
     }
     
-    private func drawControlFlowTitleText(for relationship: UMLRelationship, on path: Path) {
+    private func drawControlFlowTitleText(for relationship: UMLRelationship) {
         guard let relationshipRect = relationship.boundsAsCGRect,
               let relationshipName = relationship.name else {
             log.warning("Could not draw type text for: \(relationship)")

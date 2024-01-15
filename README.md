@@ -38,7 +38,7 @@ In Project Settings, on the tab "Package Dependencies", click "+" and add <https
 1. Add a dependency in Package.swift:
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ls1intum/apollon-ios-module", .upToNextMajor(from: "1.0.1")),
+    .package(url: "https://github.com/ls1intum/apollon-ios-module", .upToNextMajor(from: "1.0.2")),
 ]
 ```
 
