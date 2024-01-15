@@ -124,7 +124,7 @@ In this module, we focus on the editing and interaction of the new diagram type 
 
 - `Views/CreateElement/ElementCreator.swift`:
     1. Create a new struct in this file and name it `<ElementType>Creator` for each element type you want to add. Make sure each struct implements the `ElementCreator` protocol.
-    2. Add a function to each struct called `createAllElements(for type: UMLElementType, middle: CGPoint)` (use the other `ElementCreator`s as a guide) that returns an array of `UMLElement`s.
+    2. Add a function to each struct called `createAllElements(for type: UMLElementType, pointToAdd: CGPoint)` (use the other `ElementCreator`s as a guide) that returns an array of `UMLElement`s.
     3. Add a case to the `ElementCreatorFactory` enum with each new element and return the specific `ElementCreator` you just created.
 
 - `Views/Edit/EditElement/DiagramElementEditViews`:

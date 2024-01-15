@@ -82,7 +82,7 @@ open class ApollonEditViewModel: ApollonViewModel {
     //    func checkIfElementIsInContainer(elementToCheck: UMLElement) {
     //        if let elements = umlModel.elements {
     //            for element in elements {
-    //                if let type = element.value.type, type.isParentContainer {
+    //                if let type = element.value.type, type.isContainer {
     //                    if let containerRect = element.value.boundsAsCGRect, let elementRect = elementToCheck.boundsAsCGRect {
     //                        if containerRect.contains(elementRect) {
     //                            elementToCheck.owner = element.value.id
@@ -156,27 +156,31 @@ open class ApollonEditViewModel: ApollonViewModel {
 
     /// Adds an element to the UMLModel based on a UMLElementType
     func addElement(type: UMLElementType) {
-        let COLLISION_OFFSET: CGFloat = 10.0
-        var pointToAddElement = CGPoint(x: ((umlModel.size?.width ?? 1) / 2).rounded(.towardZero) + 2, y: ((umlModel.size?.height ?? 1) / 2).rounded(.towardZero) + 2)
-
-        // Check if the pointToAddElement is contained in a different element, so there is no overlap
-        // TODO: Not working correctly...
-        if let collidedElement = umlModel.elements?.first(where: { $0.value.boundsContains(point: pointToAddElement) }) {
-            if let collidedbounds = collidedElement.value.bounds {
-                pointToAddElement.x = collidedbounds.x + collidedbounds.width + COLLISION_OFFSET
-                pointToAddElement.y = collidedbounds.y + collidedbounds.height + COLLISION_OFFSET
-            }
-        }
         if let elementCreator = ElementCreatorFactory.createElementCreator(for: type) {
-            let elementsToAdd = elementCreator.createAllElements(for: type, middle: pointToAddElement)
+            let elementsToAdd = elementCreator.createAllElements(for: type, pointToAdd: getPointToAddElement())
             for element in elementsToAdd {
                 if let elementId = element.id {
                     umlModel.elements?[elementId] = element
+                    adjustDiagramSize()
                 }
             }
         } else {
             log.error("Attempted to create an unknown element")
         }
+    }
+
+    /// Returns a point where the new element should be added
+    func getPointToAddElement() -> CGPoint {
+        guard let modelWidth = umlModel.size?.width, let modelHeight = umlModel.size?.height else {
+            return CGPoint.zero
+        }
+
+        // Currently only returns a random point within the model where the new element should be added
+        // TODO: Change the way the point to add is calculated
+        let randomX = CGFloat.random(in: 0..<modelWidth).rounded(.towardZero)
+        let randomY = CGFloat.random(in: 0..<modelHeight).rounded(.towardZero)
+
+        return CGPoint(x: randomX, y: randomY)
     }
 
     /// Returns an UMLElement based on a given element ID
