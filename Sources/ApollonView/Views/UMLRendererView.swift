@@ -6,7 +6,7 @@ struct UMLRendererView<Content: View>: View {
     @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
     @State var isPreview: Bool
     @ViewBuilder var extraContent: Content
-
+    
     var body: some View {
         if viewModel.isGridBackground || self.isPreview {
             ZStack {
@@ -34,10 +34,10 @@ struct UMLRendererView<Content: View>: View {
                         viewModel.dragStarted = true
                     }
             )
-            .simultaneousGesture(
-                MagnificationGesture()
-                    .onChanged(viewModel.handleDiagramMagnification)
-                    .onEnded(viewModel.handleDiagramMagnificationEnd)
+            .simultaneousGesture(!self.isPreview ?
+                                 MagnificationGesture()
+                .onChanged(viewModel.handleDiagramMagnification)
+                .onEnded(viewModel.handleDiagramMagnificationEnd) : nil
             )
         } else {
             ZStack {
