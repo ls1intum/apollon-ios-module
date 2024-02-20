@@ -21,7 +21,7 @@ open class ApollonViewModel: ObservableObject {
     @Published public var scale: CGFloat = 1.0
     @Published public var progressingScale: CGFloat = 1.0
     @Published public var idealScale: CGFloat = 1.0
-    public var minScale: CGFloat = 0.2
+    public var minScale: CGFloat = 0.3
     public var maxScale: CGFloat = 3.0
     
     public var diagramTypeUnsupported = false

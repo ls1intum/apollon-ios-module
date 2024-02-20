@@ -4,12 +4,15 @@ import ApollonShared
 struct UMLRendererView<Content: View>: View {
     @ObservedObject var viewModel: ApollonViewViewModel
     @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
+    @State var isPreview: Bool
     @ViewBuilder var extraContent: Content
 
     var body: some View {
-        if viewModel.isGridBackground {
+        if viewModel.isGridBackground || self.isPreview {
             ZStack {
-                GridBackgroundView(gridBackgroundViewModel: gridBackgroundViewModel)
+                if viewModel.isGridBackground {
+                    GridBackgroundView(gridBackgroundViewModel: gridBackgroundViewModel)
+                }
                 Group {
                     Canvas(rendersAsynchronously: true) { context, size in
                         viewModel.render(&context, size: size)
@@ -22,8 +25,6 @@ struct UMLRendererView<Content: View>: View {
             .position(viewModel.currentDragLocation)
             .onAppear{
                 gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 7, height: viewModel.geometrySize.height * 7)
-                gridBackgroundViewModel.showGridBackgroundBorder = true
-                gridBackgroundViewModel.gridBackgroundBorderColor = viewModel.themeColor
                 viewModel.setDragLocation()
             }
             .gesture(

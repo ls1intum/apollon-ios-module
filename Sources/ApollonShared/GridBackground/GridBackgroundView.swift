@@ -12,11 +12,6 @@ public struct GridBackgroundView: View {
             Image("UMLGridBackground", bundle: .module)
                 .resizable(resizingMode: .tile)
                 .frame(width: gridBackgroundViewModel.gridSize?.width ?? nil, height: gridBackgroundViewModel.gridSize?.height ?? nil)
-            if gridBackgroundViewModel.showGridBackgroundBorder {
-                Rectangle()
-                    .stroke(gridBackgroundViewModel.gridBackgroundBorderColor ?? .blue, lineWidth: 4)
-                    .frame(width: gridBackgroundViewModel.gridSize?.width, height: gridBackgroundViewModel.gridSize?.height)
-            }
         }.ignoresSafeArea(.all)
     }
 }

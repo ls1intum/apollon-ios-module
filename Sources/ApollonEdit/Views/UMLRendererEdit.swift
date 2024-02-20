@@ -27,7 +27,6 @@ struct UMLRendererEdit: View {
                         SelectedRelationshipView(viewModel: viewModel)
                     }
                 }
-                //Rectangle().stroke(.blue, lineWidth: 1)
             }
             .frame(width: max(viewModel.umlModel.size?.width ?? 1, viewModel.initialDiagramSize.width),
                    height: max(viewModel.umlModel.size?.height ?? 1, viewModel.initialDiagramSize.height))
@@ -36,8 +35,6 @@ struct UMLRendererEdit: View {
         .position(viewModel.currentDragLocation)
         .onAppear{
             gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 8, height: viewModel.geometrySize.height * 8)
-            gridBackgroundViewModel.showGridBackgroundBorder = true
-            gridBackgroundViewModel.gridBackgroundBorderColor = viewModel.themeColor
             viewModel.setDragLocation()
         }.onChange(of: viewModel.initialDiagramSize) {
             viewModel.calculateIdealScale()
