@@ -17,6 +17,25 @@ public struct Diagram: Codable {
     }
 }
 
+/// Hashable (Equatable) extension
+extension Diagram: Hashable {
+    public static func == (lhs: Diagram, rhs: Diagram) -> Bool {
+        return lhs.id == rhs.id &&
+        lhs.title == rhs.title &&
+        lhs.lastUpdate == rhs.lastUpdate &&
+        lhs.diagramType == rhs.diagramType &&
+        lhs.model == rhs.model
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(lastUpdate)
+        hasher.combine(diagramType)
+        hasher.combine(model)
+    }
+}
+
 extension Date {
     func ISO8601FormatWithFractionalSeconds() -> String {
         let formatter = DateFormatter()

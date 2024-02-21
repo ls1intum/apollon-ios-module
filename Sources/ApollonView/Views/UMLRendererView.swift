@@ -6,9 +6,9 @@ struct UMLRendererView<Content: View>: View {
     @StateObject var gridBackgroundViewModel = GridBackgroundViewModel()
     @State var isPreview: Bool
     @ViewBuilder var extraContent: Content
-    
+
     var body: some View {
-        if viewModel.isGridBackground || self.isPreview {
+        if viewModel.isGridBackground {
             ZStack {
                 if viewModel.isGridBackground {
                     GridBackgroundView(gridBackgroundViewModel: gridBackgroundViewModel)
@@ -34,10 +34,29 @@ struct UMLRendererView<Content: View>: View {
                         viewModel.dragStarted = true
                     }
             )
-            .simultaneousGesture(!self.isPreview ?
-                                 MagnificationGesture()
-                .onChanged(viewModel.handleDiagramMagnification)
-                .onEnded(viewModel.handleDiagramMagnificationEnd) : nil
+            .simultaneousGesture(
+                MagnificationGesture()
+                    .onChanged(viewModel.handleDiagramMagnification)
+                    .onEnded(viewModel.handleDiagramMagnificationEnd)
+            )
+        } else if self.isPreview && !viewModel.isGridBackground {
+            ZStack {
+                Canvas(rendersAsynchronously: true) { context, size in
+                    viewModel.render(&context, size: size)
+                }
+                .frame(width: (viewModel.umlModel.size?.width ?? 1) + (viewModel.diagramOffset.x * 2), height: (viewModel.umlModel.size?.height ?? 1) + (viewModel.diagramOffset.y * 2))
+            }
+            .scaleEffect(viewModel.scale * viewModel.progressingScale)
+            .position(viewModel.currentDragLocation)
+            .onAppear{
+                viewModel.setDragLocation()
+            }
+            .gesture(
+                DragGesture()
+                    .onChanged(viewModel.handleDiagramDrag)
+                    .onEnded { _ in
+                        viewModel.dragStarted = true
+                    }
             )
         } else {
             ZStack {

@@ -136,7 +136,7 @@ public class UMLElement: Codable, SelectableUMLItem {
         guard let bounds else {
             return false
         }
-        
+
         let isXWithinBounds = point.x > bounds.x && point.x < (bounds.x + bounds.width)
         let isYWithinBounds = point.y > bounds.y && point.y < (bounds.y + bounds.height)
 
@@ -154,5 +154,32 @@ public class UMLElement: Codable, SelectableUMLItem {
                 }
             }
         }
+    }
+}
+
+/// Hashable (Equatable) extension
+extension UMLElement: Hashable {
+    public static func == (lhs: UMLElement, rhs: UMLElement) -> Bool {
+        return lhs.id == rhs.id &&
+        lhs.name == rhs.name &&
+        lhs.type == rhs.type &&
+        lhs.owner == rhs.owner &&
+        lhs.bounds == rhs.bounds &&
+        lhs.direction == rhs.direction &&
+        lhs.assessmentNote == rhs.assessmentNote &&
+        lhs.attributes == rhs.attributes &&
+        lhs.methods == rhs.methods
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(name)
+        hasher.combine(type)
+        hasher.combine(owner)
+        hasher.combine(bounds)
+        hasher.combine(direction)
+        hasher.combine(assessmentNote)
+        hasher.combine(attributes)
+        hasher.combine(methods)
     }
 }
