@@ -145,6 +145,7 @@ struct SelectedElementView: View {
                 if !elementMoveStarted && !elementResizeStarted {
                     if let isElementNotEditable = (viewModel.selectedElement as? UMLElement)?.type?.isElementNotEditable {
                         EditSelectedItemButton(viewModel: viewModel, isElementNotEditable: isElementNotEditable)
+                            .accessibilityIdentifier("EditElementButton")
                             .position(CGPoint(x: bounds.x - 35, y: bounds.y - 35))
                     }
                 }
