@@ -23,14 +23,12 @@ public struct ApollonView<Content: View>: View {
                 UMLRendererView(viewModel: viewModel, isPreview: isPreview, extraContent: {
                     extraContent
                 })
-                if viewModel.isGridBackground {
+                if !isPreview {
                     ResetZoomAndPositionButton(viewModel: viewModel)
                 }
             }
             .onAppear() {
-                if viewModel.isGridBackground || self.isPreview {
-                    viewModel.setupScale(geometrySize: geometry.size)
-                }
+                viewModel.setupScale(geometrySize: geometry.size)
             }
         }
     }

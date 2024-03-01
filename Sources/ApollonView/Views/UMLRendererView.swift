@@ -8,7 +8,7 @@ struct UMLRendererView<Content: View>: View {
     @ViewBuilder var extraContent: Content
 
     var body: some View {
-        if viewModel.isGridBackground {
+        if !isPreview {
             ZStack {
                 if viewModel.isGridBackground {
                     GridBackgroundView(gridBackgroundViewModel: gridBackgroundViewModel)
@@ -24,7 +24,7 @@ struct UMLRendererView<Content: View>: View {
             .scaleEffect(viewModel.scale * viewModel.progressingScale)
             .position(viewModel.currentDragLocation)
             .onAppear{
-                gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 7, height: viewModel.geometrySize.height * 7)
+                gridBackgroundViewModel.gridSize = CGSize(width: viewModel.geometrySize.width * 8, height: viewModel.geometrySize.height * 8)
                 viewModel.setDragLocation()
             }
             .gesture(
@@ -39,7 +39,7 @@ struct UMLRendererView<Content: View>: View {
                     .onChanged(viewModel.handleDiagramMagnification)
                     .onEnded(viewModel.handleDiagramMagnificationEnd)
             )
-        } else if self.isPreview && !viewModel.isGridBackground {
+        } else {
             ZStack {
                 Canvas(rendersAsynchronously: true) { context, size in
                     viewModel.render(&context, size: size)
@@ -58,13 +58,6 @@ struct UMLRendererView<Content: View>: View {
                         viewModel.dragStarted = true
                     }
             )
-        } else {
-            ZStack {
-                Canvas(rendersAsynchronously: true) { context, size in
-                    viewModel.render(&context, size: size)
-                }
-                .frame(width: (viewModel.umlModel.size?.width ?? 1) + (viewModel.diagramOffset.x * 2), height: (viewModel.umlModel.size?.height ?? 1) + (viewModel.diagramOffset.y * 2))
-            }
-        }
+        } 
     }
 }
