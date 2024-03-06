@@ -171,8 +171,12 @@ open class ApollonEditViewModel: ApollonViewModel {
 
     /// Returns a point where the new element should be added
     func getPointToAddElement() -> CGPoint {
-        guard let modelWidth = umlModel.size?.width, let modelHeight = umlModel.size?.height else {
-            return CGPoint.zero
+        guard let modelWidth = umlModel.size?.width,
+              let modelHeight = umlModel.size?.height,
+              modelWidth >= 1,
+              modelHeight >= 1
+        else {
+            return CGPoint(x: 0, y: 0)
         }
 
         // Currently only returns a random point within the model where the new element should be added
