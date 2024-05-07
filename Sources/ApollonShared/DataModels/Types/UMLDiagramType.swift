@@ -13,7 +13,8 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
     case reachabilityGraph = "ReachabilityGraph"
     case syntaxTree = "SyntaxTree"
     case flowchart = "Flowchart"
-    
+    case BPMN = "BPMN"
+
     /// The different elements of each diagram, that the user can create
     public var diagramElementTypes: [UMLElementType] {
         switch self {
@@ -39,6 +40,8 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
             return [.syntaxTreeNonterminal, .syntaxTreeTerminal]
         case .flowchart:
             return [.flowchartFunctionCall, .flowchartInputOutput, .flowchartDecision, .flowchartProcess, .flowchartTerminal]
+        case .BPMN:
+            return []
         }
     }
     
@@ -68,6 +71,8 @@ public enum UMLDiagramType: String, Codable, CaseIterable {
             return [.syntaxTreeLink]
         case .flowchart:
             return [.flowchartFlowline]
+        case .BPMN:
+            return []
         }
     }
     
