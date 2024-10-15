@@ -10,8 +10,8 @@ public class UMLElement: Codable, SelectableUMLItem {
     public var bounds: Boundary?
     public var direction: ElementDirection?
     public var assessmentNote: String?
-    public var attributes: [String]?
-    public var methods: [String]?
+    public var attributes: [UMLElement]?
+    public var methods: [UMLElement]?
     public var children: [UMLElement]? = [] // not decoded
 
     /// Public Init, so that new UML elements can be created
@@ -23,8 +23,9 @@ public class UMLElement: Codable, SelectableUMLItem {
         self.bounds = bounds
         self.direction = direction
         self.assessmentNote = assessmentNote
-        self.attributes = attributes ?? []
-        self.methods = methods ?? []
+        self.attributes = []
+        self.methods = []
+       
     }
 
     /// UMLElement Coding Keys
@@ -42,7 +43,7 @@ public class UMLElement: Codable, SelectableUMLItem {
 
     /// Public encode function to encode elements without the children property
     public func encode(to encoder: Encoder) throws {
-        self.encodeChildrenToArray()
+        //self.encodeChildrenToArray()
         var container = encoder.container(keyedBy: UMLElementCodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
@@ -141,19 +142,6 @@ public class UMLElement: Codable, SelectableUMLItem {
         let isYWithinBounds = point.y > bounds.y && point.y < (bounds.y + bounds.height)
 
         return isXWithinBounds && isYWithinBounds
-    }
-
-    public func encodeChildrenToArray() {
-        if let children {
-            for child in children {
-                if [UMLElementType.classAttribute, .objectAttribute].contains(child.type) {
-                    self.attributes?.append(child.id ?? "")
-                }
-                if [UMLElementType.classMethod, .objectMethod].contains(child.type) {
-                    self.methods?.append(child.id ?? "")
-                }
-            }
-        }
     }
 }
 

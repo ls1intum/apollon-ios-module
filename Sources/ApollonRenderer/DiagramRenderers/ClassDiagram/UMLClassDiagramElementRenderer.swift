@@ -28,12 +28,17 @@ struct UMLClassDiagramElementRenderer: UMLDiagramRenderer {
         for element in elements {
             if [UMLElementType.Class, .abstractClass, .interface, .enumeration].contains(element.value.type) {
                 draw(element: element.value)
-            }
-        }
-        
-        for element in elements {
-            if [UMLElementType.classAttribute, .classMethod].contains(element.value.type) {
-                draw(element: element.value)
+                if let attributes  = element.value.attributes {
+                    for attribute in attributes {
+                        draw(element: attribute)
+                    }
+                }
+                if let methods  = element.value.methods {
+                    for method in methods {
+                        draw(element: method)
+                    }
+                }
+               
             }
         }
     }
@@ -139,7 +144,7 @@ struct UMLClassDiagramElementRenderer: UMLDiagramRenderer {
 
     private func drawAttributeAndMethodSeparators(_ element: UMLElement, in elementRect: CGRect) {
         // Draw a line above the first attribute of this element
-        if let firstAttribute = element.verticallySortedChildren?.first(where: { $0.type == .classAttribute }),
+        if let firstAttribute = element.attributes?.first,
            let firstAttributeTopLeft = firstAttribute.boundsAsCGRect?.origin,
            let firstAttributeSize = firstAttribute.boundsAsCGRect?.size {
             let firstAttributeTopRight = firstAttributeTopLeft.applying(.init(translationX: firstAttributeSize.width, y: 0))
@@ -152,7 +157,7 @@ struct UMLClassDiagramElementRenderer: UMLDiagramRenderer {
         }
         
         // Draw a line above the first method of this element
-        if let firstMethod = element.verticallySortedChildren?.first(where: { $0.type == .classMethod }),
+        if let firstMethod = element.methods?.first,
            let firstMethodTopLeft = firstMethod.boundsAsCGRect?.origin,
            let firstMethodSize = firstMethod.boundsAsCGRect?.size {
             let firstMethodTopRight = firstMethodTopLeft.applying(.init(translationX: firstMethodSize.width, y: 0))

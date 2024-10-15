@@ -54,9 +54,9 @@ struct ClassCreator: ElementCreator {
         let element = UMLElement(id: elementID, type: type, bounds: Boundary(x: pointToAdd.x, y: pointToAdd.y, width: 200, height: 120))
         let elementAttribute = UMLElement(name: "+ attribute: Type", type: .classAttribute, owner: elementID, bounds: Boundary(x: pointToAdd.x, y: pointToAdd.y + 40, width: 200, height: 40))
         let elementMethod = UMLElement(name: "+ method()", type: .classMethod, owner: elementID, bounds: Boundary(x: pointToAdd.x, y: pointToAdd.y + 80, width: 200, height: 40))
-        element.addChild(elementAttribute)
-        element.addChild(elementMethod)
-        return [element, elementAttribute, elementMethod]
+        element.attributes?.append(elementAttribute)
+        element.methods?.append(elementMethod)
+        return [element]
     }
 }
 
@@ -66,9 +66,7 @@ struct AbstractClassOrInterfaceCreator: ElementCreator {
         let element = UMLElement(id: elementID, type: type, bounds: Boundary(x: pointToAdd.x, y: pointToAdd.y, width: 200, height: 130))
         let elementAttribute = UMLElement(name: "+ attribute: Type", type: .classAttribute, owner: elementID, bounds: Boundary(x: pointToAdd.x, y: pointToAdd.y + 50, width: 200, height: 40))
         let elementMethod = UMLElement(name: "+ method()", type: .classMethod, owner: elementID, bounds: Boundary(x: pointToAdd.x, y: pointToAdd.y + 90, width: 200, height: 40))
-        element.addChild(elementAttribute)
-        element.addChild(elementMethod)
-        return [element, elementAttribute, elementMethod]
+        return [element]
     }
 }
 

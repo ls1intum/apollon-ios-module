@@ -63,20 +63,25 @@ open class ApollonEditViewModel: ApollonViewModel {
     /// Update the position of an UMLElement
     func updateElementPosition(value: DragGesture.Value) {
         if let element = selectedElement as? UMLElement {
-            updatePositionRecursivelyForAllChildren(element, translation: value.translation)
+            updatePositionRecursively(element, translation: value.translation)
         }
     }
 
     /// Recursively check the children of each element and move them, until an element has no more children
-    private func updatePositionRecursivelyForAllChildren(_ element: UMLElement, translation: CGSize) {
+    private func updatePositionRecursively(_ element: UMLElement, translation: CGSize) {
         element.bounds?.x += translation.width.rounded(.towardZero)
         element.bounds?.y += translation.height.rounded(.towardZero)
-
-        if let children = element.children {
-            for child in children {
-                updatePositionRecursivelyForAllChildren(child, translation: translation)
+        if let attributes  = element.attributes {
+            for attribute in attributes {
+                updatePositionRecursively(attribute, translation: translation)
             }
         }
+        if let methods = element.methods {
+            for method in methods {
+                updatePositionRecursively(method, translation: translation)
+            }
+        }
+        
     }
 
     //    func checkIfElementIsInContainer(elementToCheck: UMLElement) {
@@ -161,6 +166,7 @@ open class ApollonEditViewModel: ApollonViewModel {
             for element in elementsToAdd {
                 if let elementId = element.id {
                     umlModel.elements?[elementId] = element
+                    print("FUNCTION add Element", element.name, element.attributes, element.methods)
                     adjustDiagramSize()
                 }
             }
