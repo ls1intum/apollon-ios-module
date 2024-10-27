@@ -43,7 +43,6 @@ public class UMLElement: Codable, SelectableUMLItem {
 
     /// Public encode function to encode elements without the children property
     public func encode(to encoder: Encoder) throws {
-        //self.encodeChildrenToArray()
         var container = encoder.container(keyedBy: UMLElementCodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
@@ -118,7 +117,6 @@ public class UMLElement: Codable, SelectableUMLItem {
             self.children?.append(child)
         }
     }
-
     /// Remove a child from a UML element
     public func removeChild(_ child: UMLElement) {
         if let allChildren = self.verticallySortedChildren,
