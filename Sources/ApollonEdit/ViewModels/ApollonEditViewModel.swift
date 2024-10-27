@@ -84,21 +84,6 @@ open class ApollonEditViewModel: ApollonViewModel {
         
     }
 
-    //    func checkIfElementIsInContainer(elementToCheck: UMLElement) {
-    //        if let elements = umlModel.elements {
-    //            for element in elements {
-    //                if let type = element.value.type, type.isContainer {
-    //                    if let containerRect = element.value.boundsAsCGRect, let elementRect = elementToCheck.boundsAsCGRect {
-    //                        if containerRect.contains(elementRect) {
-    //                            elementToCheck.owner = element.value.id
-    //                            element.value.addChild(elementToCheck)
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-
     /// Updates the Element Size after dragging the resize button
     func updateElementSize(drag: CGSize) {
         let widthToAdd = drag.width.rounded(.towardZero)
@@ -109,10 +94,16 @@ open class ApollonEditViewModel: ApollonViewModel {
             element.bounds?.height += heightToAdd
 
             if element.type?.isContainer == false {
-                if let children = element.children {
-                    for child in children {
-                        child.bounds?.width += widthToAdd
-                        child.bounds?.height += heightToAdd
+                if let attributes = element.attributes{
+                    for attribute in attributes {
+                        attribute.bounds?.width += widthToAdd
+                        attribute.bounds?.height += heightToAdd
+                    }
+                }
+                if let methods = element.methods{
+                    for method in methods {
+                        method.bounds?.width += widthToAdd
+                        method.bounds?.height += heightToAdd
                     }
                 }
             }
@@ -126,7 +117,7 @@ open class ApollonEditViewModel: ApollonViewModel {
         var largestYBottomRight: CGFloat = 0.0
         var smallestXTopLeft: CGFloat = 0.0
         var smallestYTopLeft: CGFloat = 0.0
-
+        
         if let elements = umlModel.elements {
             for element in elements {
                 if let bounds = element.value.bounds {
@@ -151,10 +142,23 @@ open class ApollonEditViewModel: ApollonViewModel {
                 for element in elements {
                     element.value.bounds?.x += abs(smallestXTopLeft)
                     element.value.bounds?.y += abs(smallestYTopLeft)
+                    if let attributes = element.value.attributes {
+                        for attribute in attributes {
+                            attribute.bounds?.x += abs(smallestXTopLeft)
+                            attribute.bounds?.y += abs(smallestYTopLeft)
+                        }
+                    }
+                    if let methods = element.value.methods {
+                        for method in methods {
+                            method.bounds?.x += abs(smallestXTopLeft)
+                            method.bounds?.y += abs(smallestYTopLeft)
+                        }
+                    }
                 }
                 umlModel.size?.width += -(smallestXTopLeft) + DIAGRAM_MARGIN
                 umlModel.size?.height += -(smallestYTopLeft) + DIAGRAM_MARGIN
             }
+            
             calculateIdealScale()
         }
     }
@@ -166,7 +170,6 @@ open class ApollonEditViewModel: ApollonViewModel {
             for element in elementsToAdd {
                 if let elementId = element.id {
                     umlModel.elements?[elementId] = element
-                    print("FUNCTION add Element", element.name, element.attributes, element.methods)
                     adjustDiagramSize()
                 }
             }

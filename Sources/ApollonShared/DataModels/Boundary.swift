@@ -14,7 +14,7 @@ public struct Boundary: Codable {
         self.width = width
         self.height = height
     }
-    // swiftlint:enable identifier_name
+    // swiftlint:enable identifier_nae
 }
 
 /// Hashable (Equatable) extension
