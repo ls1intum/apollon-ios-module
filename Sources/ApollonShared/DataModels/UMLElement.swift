@@ -117,6 +117,43 @@ public class UMLElement: Codable, SelectableUMLItem {
             self.children?.append(child)
         }
     }
+    //// NEWLY ADDED
+    public func addAttribute(_ attribute: UMLElement) {
+        if attributes == nil {
+            self.attributes = [attribute]
+        } else {
+            self.attributes?.append(attribute)
+        }
+    }
+    public func addMethod(_ method: UMLElement) {
+        if methods == nil {
+            self.methods = [method]
+        } else {
+            self.methods?.append(method)
+        }
+    }
+    
+    public var verticallySortedAttributes: [UMLElement]? {
+        attributes?.sorted(by: { ($0.bounds?.y ?? 0.0) < ($1.bounds?.y ?? 0.0) })
+    }
+    
+    public var verticallySortedMethods: [UMLElement]? {
+        methods?.sorted(by: { ($0.bounds?.y ?? 0.0) < ($1.bounds?.y ?? 0.0) })
+    }
+    
+    public func removeAttribute(_ attribute: UMLElement) {
+        if let allAttributes = self.verticallySortedAttributes,
+           let indexOfAttributeToRemove = allAttributes.firstIndex(where: { $0.id == attribute.id }) {
+            for (index, element) in allAttributes.enumerated() where index > indexOfAttributeToRemove {
+                let newYForElement = (element.bounds?.y ?? 0) - (attribute.bounds?.height ?? 0)
+                allAttributes[index].bounds?.y = newYForElement
+            }
+        }
+        let newHeight = (self.bounds?.height ?? 0) - (attribute.bounds?.height ?? 0)
+        self.bounds?.height = newHeight
+        self.attributes?.removeAll { $0.id == attribute.id }
+    }
+    /////END OF  NEWLY ADDED
     /// Remove a child from a UML element
     public func removeChild(_ child: UMLElement) {
         if let allChildren = self.verticallySortedChildren,
