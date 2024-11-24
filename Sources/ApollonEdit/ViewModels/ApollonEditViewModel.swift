@@ -63,36 +63,26 @@ open class ApollonEditViewModel: ApollonViewModel {
     /// Update the position of an UMLElement
     func updateElementPosition(value: DragGesture.Value) {
         if let element = selectedElement as? UMLElement {
-            updatePositionRecursivelyForAllChildren(element, translation: value.translation)
+            updatePositionRecursively(element, translation: value.translation)
         }
     }
 
     /// Recursively check the children of each element and move them, until an element has no more children
-    private func updatePositionRecursivelyForAllChildren(_ element: UMLElement, translation: CGSize) {
+    private func updatePositionRecursively(_ element: UMLElement, translation: CGSize) {
         element.bounds?.x += translation.width.rounded(.towardZero)
         element.bounds?.y += translation.height.rounded(.towardZero)
-
-        if let children = element.children {
-            for child in children {
-                updatePositionRecursivelyForAllChildren(child, translation: translation)
+        if let attributes  = element.attributes {
+            for attribute in attributes {
+                updatePositionRecursively(attribute, translation: translation)
             }
         }
+        if let methods = element.methods {
+            for method in methods {
+                updatePositionRecursively(method, translation: translation)
+            }
+        }
+        
     }
-
-    //    func checkIfElementIsInContainer(elementToCheck: UMLElement) {
-    //        if let elements = umlModel.elements {
-    //            for element in elements {
-    //                if let type = element.value.type, type.isContainer {
-    //                    if let containerRect = element.value.boundsAsCGRect, let elementRect = elementToCheck.boundsAsCGRect {
-    //                        if containerRect.contains(elementRect) {
-    //                            elementToCheck.owner = element.value.id
-    //                            element.value.addChild(elementToCheck)
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
 
     /// Updates the Element Size after dragging the resize button
     func updateElementSize(drag: CGSize) {
@@ -104,10 +94,16 @@ open class ApollonEditViewModel: ApollonViewModel {
             element.bounds?.height += heightToAdd
 
             if element.type?.isContainer == false {
-                if let children = element.children {
-                    for child in children {
-                        child.bounds?.width += widthToAdd
-                        child.bounds?.height += heightToAdd
+                if let attributes = element.attributes{
+                    for attribute in attributes {
+                        attribute.bounds?.width += widthToAdd
+                        attribute.bounds?.height += heightToAdd
+                    }
+                }
+                if let methods = element.methods{
+                    for method in methods {
+                        method.bounds?.width += widthToAdd
+                        method.bounds?.height += heightToAdd
                     }
                 }
             }
@@ -121,7 +117,7 @@ open class ApollonEditViewModel: ApollonViewModel {
         var largestYBottomRight: CGFloat = 0.0
         var smallestXTopLeft: CGFloat = 0.0
         var smallestYTopLeft: CGFloat = 0.0
-
+        
         if let elements = umlModel.elements {
             for element in elements {
                 if let bounds = element.value.bounds {
@@ -146,10 +142,23 @@ open class ApollonEditViewModel: ApollonViewModel {
                 for element in elements {
                     element.value.bounds?.x += abs(smallestXTopLeft)
                     element.value.bounds?.y += abs(smallestYTopLeft)
+                    if let attributes = element.value.attributes {
+                        for attribute in attributes {
+                            attribute.bounds?.x += abs(smallestXTopLeft)
+                            attribute.bounds?.y += abs(smallestYTopLeft)
+                        }
+                    }
+                    if let methods = element.value.methods {
+                        for method in methods {
+                            method.bounds?.x += abs(smallestXTopLeft)
+                            method.bounds?.y += abs(smallestYTopLeft)
+                        }
+                    }
                 }
                 umlModel.size?.width += -(smallestXTopLeft) + DIAGRAM_MARGIN
                 umlModel.size?.height += -(smallestYTopLeft) + DIAGRAM_MARGIN
             }
+            
             calculateIdealScale()
         }
     }
