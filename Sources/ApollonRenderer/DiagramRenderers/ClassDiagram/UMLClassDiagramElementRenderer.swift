@@ -29,13 +29,20 @@ struct UMLClassDiagramElementRenderer: UMLDiagramRenderer {
             if [UMLElementType.Class, .abstractClass, .interface, .enumeration].contains(element.value.type) {
                 draw(element: element.value)
             }
-        }
-        
-        for element in elements {
             if [UMLElementType.classAttribute, .classMethod].contains(element.value.type) {
                 draw(element: element.value)
             }
+            if let children  = element.value.children {
+                for child in children {
+                    if [UMLElementType.classAttribute, .classMethod].contains(child.type) {
+                        draw(element: child)
+                    }
+                }
+            }
+
         }
+        
+   
     }
     
     private func draw(element: UMLElement) {
